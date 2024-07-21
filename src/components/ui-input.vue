@@ -10,7 +10,7 @@ const model = defineModel()
   >
 </template>
 
-<style scoped lang="scss">
+<style scoped lang="postcss">
 .ui-input {
   width: 300px;
   height: var(--ui-height);

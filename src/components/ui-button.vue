@@ -24,7 +24,7 @@ defineProps({
   </button>
 </template>
 
-<style scoped lang="scss">
+<style scoped lang="postcss">
 .ui-button {
   padding: 10px 15px;
   height: var(--ui-height);

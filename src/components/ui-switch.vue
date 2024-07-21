@@ -18,7 +18,7 @@ const model = defineModel()
     </label>
 </template>
 
-<style lang="scss">
+<style lang="postcss">
 .ui-switch {
   position: relative;
   display: inline-block;

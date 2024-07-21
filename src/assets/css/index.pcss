@@ -1,7 +1,9 @@
-@import "./variables/index.scss";
+@import "./variables/index.pcss";
+@import "tailwind.pcss";
 
 html,
-body {
+body,
+#app {
     height: 100%;
     color: var(--color-text);
     background-color: var(--color-bg-main);
@@ -17,15 +19,6 @@ body {
     -moz-osx-font-smoothing: grayscale;
 }
 
-#app {
+/* {
     text-align: center;
-    margin-top: 60px;
-}
-
-a {
-    color: var(--color-link);
-
-    &:hover {
-        color: var(--color-link-hover);
-    }
-}
+}*/

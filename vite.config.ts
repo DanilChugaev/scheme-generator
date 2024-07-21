@@ -15,9 +15,4 @@ export default defineConfig({
         vue(),
     ],
     base: './',
-    // @ts-ignore
-    test: {
-        globals: true,
-        environment: 'happy-dom',
-    },
 });
