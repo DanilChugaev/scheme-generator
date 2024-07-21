@@ -1,0 +1,31 @@
+@import "./variables/index.scss";
+
+html,
+body {
+    height: 100%;
+    color: var(--color-text);
+    background-color: var(--color-bg-main);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: sans-serif;
+    font-family: Avenir, Helvetica, Arial, 'sans-serif';
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+#app {
+    text-align: center;
+    margin-top: 60px;
+}
+
+a {
+    color: var(--color-link);
+
+    &:hover {
+        color: var(--color-link-hover);
+    }
+}

@@ -1,0 +1,24 @@
+:root {
+    --color-bg-main: #fff;
+    --color-bg-button: var(--color-bg-main);
+    --color-bg-button-hover: #f3f4f6;
+    --color-bg-button-active: hsla(220,14%,93%,1);
+    --color-text: #1F2328;
+    --color-border: rgb(216, 222, 228);
+    --color-border-hover: rgba(31,35,40,0.15);
+    --color-border-active: rgba(31,35,40,0.15);
+    --color-link: var(--color-text);
+    --color-link-hover: #053ea6;
+}
+
+html.dark-mode {
+    --color-bg-main: #22272e;
+    --color-bg-button-hover: #444c56;
+    --color-bg-button-active: hsla(213,12%,27%,1);
+    --color-text: #adbac7;
+    --color-border: #373e47;
+    --color-border-hover: #768390;
+    --color-border-active: #636e7b;
+    --color-link: #cdd9e5;
+    --color-link-hover: rgba(205,217,229,0.7);
+}
