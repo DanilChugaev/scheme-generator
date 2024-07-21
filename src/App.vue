@@ -35,11 +35,6 @@ const log = () => console.log(text.value)
     <div>
       {{ text }}
     </div>
-
-    <router-link :to="`${$basePath}/`">Index</router-link>
-    <br>
-    <router-link :to="`${$basePath}/home`">Go to Home</router-link>
-    <router-view></router-view>
   </div>
 </template>
 

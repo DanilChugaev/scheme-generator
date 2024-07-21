@@ -1,6 +1,5 @@
 import { createApp } from 'vue';
 import App from './App.vue';
-import Router from './router';
 import VFocus from './directives/v-focus';
 import toggleDarkMode from './functions/toggleDarkMode';
 
@@ -11,6 +10,4 @@ app.provide('toggleDarkMode', toggleDarkMode());
 
 app.directive(VFocus.name, VFocus);
 
-app
-  .use(Router)
-  .mount('#app');
+app.mount('#app');
