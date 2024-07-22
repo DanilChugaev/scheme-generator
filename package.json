@@ -11,10 +11,12 @@
     "sprite": "node src/tools/sprite-generator.cjs"
   },
   "dependencies": {
+    "@primevue/themes": "^4.0.0",
     "autoprefixer": "^10.4.19",
     "postcss": "^8.4.39",
     "postcss-custom-media": "^10.0.8",
     "postcss-nested": "^6.2.0",
+    "primevue": "^4.0.0",
     "vue": "^3.4.33",
     "vue-router": "^4.4.0"
   },
