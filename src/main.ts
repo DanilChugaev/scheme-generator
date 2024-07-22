@@ -5,6 +5,7 @@ import toggleDarkMode from './functions/toggleDarkMode'
 import PrimeVue from 'primevue/config'
 import Aura from '@primevue/themes/aura'
 import { definePreset } from '@primevue/themes'
+import VueKonva from 'vue-konva'
 
 const app = createApp(App);
 
@@ -32,6 +33,7 @@ const MyPreset = definePreset(Aura, {
 });
 
 app
+  .use(VueKonva)
   .use(PrimeVue, {
     theme: {
       preset: MyPreset,
