@@ -7,7 +7,11 @@ import { useSettings } from '../../composables/useSettings'
 const container = ref(null)
 const { width, height } = useElementSize(container)
 const { stage, scaling } = useWorkspace()
-const { list, groupConfig } = useSettings()
+const {
+  list,
+  groupConfig,
+  paintCell,
+} = useSettings()
 
 const configKonva = reactive({
   width,
@@ -26,11 +30,21 @@ onMounted(() => {
     <v-stage :config="configKonva">
       <v-layer>
         <v-group :config="groupConfig">
-          <v-rect
-              v-for="item in list"
-              :key="item.id"
-              :config="item"
-          />
+          <template v-for="item in list">
+            <template v-if="item.type === 'text'">
+              <v-text
+                  v-if="item.text != '0'"
+                  :key="item.id"
+                  :config="item"
+              />
+            </template>
+            <v-rect
+                v-else
+                :key="item.id"
+                :config="item"
+                @click="paintCell(item.id)"
+            />
+          </template>
         </v-group>
       </v-layer>
     </v-stage>

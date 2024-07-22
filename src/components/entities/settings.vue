@@ -2,6 +2,8 @@
 import Checkbox from 'primevue/checkbox'
 import ToggleSwitch from 'primevue/toggleswitch'
 import InputText from 'primevue/inputtext'
+import ColorPicker from 'primevue/colorpicker'
+
 import { useSettings } from '../../composables/useSettings'
 
 const {
@@ -10,6 +12,7 @@ const {
   hasCellOffset,
   schemeWidth,
   schemeHeight,
+  cellColor,
   toggleDarkMode,
 } = useSettings()
 </script>
@@ -46,6 +49,12 @@ const {
       <h3>Высота схемы</h3>
 
       <input-text class="max-w-[100px]" type="number" v-model="schemeHeight" />
+    </div>
+
+    <div class="flex justify-between items-center gap-4">
+      <h3>Выбрать цвет</h3>
+
+      <color-picker v-model="cellColor" inputId="cp-hex" format="hex" class="mb-3" />
     </div>
   </div>
 </template>
