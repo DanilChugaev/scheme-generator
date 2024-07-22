@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, PropType } from 'vue'
 import sprite from '~/assets/img/sprite.svg'
-import { IconTypes } from './types/icon'
+import { IconTypes } from '../types/icon'
 
 const props = defineProps({
   name: {

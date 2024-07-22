@@ -1,24 +1,13 @@
 <script lang="ts" setup>
-import { ref, inject } from 'vue'
-
-import UiSwitch from './components/ui-switch.vue'
-
-const toggleDarkMode = inject('toggleDarkMode')
-
-const text = ref('')
-const isDark = ref(toggleDarkMode())
-const log = () => console.log(text.value)
+import Settings from './components/entities/settings.vue'
+import Workspace from './components/entities/workspace.vue'
 </script>
 
 <template>
-  <div class="flex gap-4">
-    <div class="w-full">
-sd
-    </div>
+  <div class="h-full flex">
+    <workspace />
 
-    <div class="w-[300px]">
-      <ui-switch v-model="isDark" @change="toggleDarkMode"/>
-    </div>
+    <settings />
   </div>
 </template>
 

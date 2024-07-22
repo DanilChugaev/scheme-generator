@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import UiIcon from '~/components/ui-icon.vue'
+import UiIcon from '~/components/ui/ui-icon.vue'
 
 const model = defineModel()
 </script>
@@ -32,7 +32,7 @@ const model = defineModel()
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: lightblue;
+    background-color: #93c5fd;
     border-radius: 34px;
     transition: 0.6s;
 
@@ -55,7 +55,7 @@ const model = defineModel()
     height: 0;
 
     &:checked + .ui-switch__slider {
-      background-color: #1e2ea8;
+      background-color: #3b82f6;
     }
 
     &:checked + .ui-switch__slider::before {
