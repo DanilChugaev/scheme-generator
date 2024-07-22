@@ -14,8 +14,8 @@ export function useSettings() {
 
   const hasCellOffset = useStorage('has-cell-offset', false)
   const isSquare = useStorage('is-square', true)
-  const schemeWidth = useStorage('scheme-width', 20)
-  const schemeHeight = useStorage('scheme-height', 40)
+  const schemeWidth = useStorage('scheme-width', 10)
+  const schemeHeight = useStorage('scheme-height', 20)
   const cellColor = useStorage('cell-color', '6466f1')
 
   const list = ref([])
