@@ -1,12 +1,17 @@
 <script setup lang="ts">
-import { ref, inject } from 'vue'
 import Checkbox from 'primevue/checkbox'
 import ToggleSwitch from 'primevue/toggleswitch'
+import InputText from 'primevue/inputtext'
+import { useSettings } from '../../composables/useSettings'
 
-const toggleDarkMode = inject('toggleDarkMode')
-
-const isDark = ref(toggleDarkMode())
-const hasOffset = ref(false)
+const {
+  isDark,
+  isSquare,
+  hasCellOffset,
+  schemeWidth,
+  schemeHeight,
+  toggleDarkMode,
+} = useSettings()
 </script>
 
 <template>
@@ -14,7 +19,7 @@ const hasOffset = ref(false)
     <h2>Настройки</h2>
 
     <div class="flex justify-between items-center gap-4">
-      <h3>Тема</h3>
+      <h3>Темная тема</h3>
 
       <toggle-switch v-model="isDark" @change="toggleDarkMode" />
     </div>
@@ -22,7 +27,25 @@ const hasOffset = ref(false)
     <div class="flex justify-between items-center gap-4">
       <h3>Со смещением</h3>
 
-      <checkbox v-model="hasOffset" :binary="true" />
+      <checkbox v-model="hasCellOffset" :binary="true" />
+    </div>
+
+    <div class="flex justify-between items-center gap-4">
+      <h3>Квадратные</h3>
+
+      <checkbox v-model="isSquare" :binary="true" />
+    </div>
+
+    <div class="flex justify-between items-center gap-4">
+      <h3>Ширина схемы</h3>
+
+      <input-text class="max-w-[100px]" type="number" v-model="schemeWidth" />
+    </div>
+
+    <div class="flex justify-between items-center gap-4">
+      <h3>Высота схемы</h3>
+
+      <input-text class="max-w-[100px]" type="number" v-model="schemeHeight" />
     </div>
   </div>
 </template>
