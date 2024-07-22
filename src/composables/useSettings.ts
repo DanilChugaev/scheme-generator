@@ -1,5 +1,6 @@
 import { computed, inject, reactive, ref, watchEffect } from 'vue'
-import { useStorage } from '@vueuse/core'
+import { useStorage, useDateFormat, useNow } from '@vueuse/core'
+import { useWorkspace } from './useWorkspace'
 
 const groupConfig = reactive({
   x: 20,
@@ -9,6 +10,7 @@ const groupConfig = reactive({
 
 export function useSettings() {
   const toggleDarkMode = inject('toggleDarkMode')
+  const { stage } = useWorkspace()
 
   const hasCellOffset = useStorage('has-cell-offset', false)
   const isSquare = useStorage('is-square', true)
@@ -86,6 +88,23 @@ export function useSettings() {
     cell.fill = cell.fill === newColor ? initialCellFill.value : newColor
   }
 
+  function downloadURI(uri, name) {
+    const link = document.createElement('a')
+    link.download = name
+    link.href = uri
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    // delete link
+  }
+
+  const exportImage = () => {
+    const dataURL = stage.value.toDataURL({ pixelRatio: 3 })
+    const formattedTime = useDateFormat(useNow(), 'DD-MM-YYYY HH-mm-ss')
+
+    downloadURI(dataURL, `${formattedTime.value}.png`)
+  }
+
   return {
     list,
     isDark,
@@ -97,5 +116,6 @@ export function useSettings() {
     cellColor,
     toggleDarkMode,
     paintCell,
+    exportImage,
   }
 }

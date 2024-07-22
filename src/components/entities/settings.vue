@@ -3,6 +3,7 @@ import Checkbox from 'primevue/checkbox'
 import ToggleSwitch from 'primevue/toggleswitch'
 import InputText from 'primevue/inputtext'
 import ColorPicker from 'primevue/colorpicker'
+import PrimeButton from 'primevue/button'
 
 import { useSettings } from '../../composables/useSettings'
 
@@ -14,6 +15,7 @@ const {
   schemeHeight,
   cellColor,
   toggleDarkMode,
+  exportImage,
 } = useSettings()
 </script>
 
@@ -54,8 +56,14 @@ const {
     <div class="flex justify-between items-center gap-4">
       <h3>Выбрать цвет</h3>
 
-      <color-picker v-model="cellColor" inputId="cp-hex" format="hex" class="mb-3" />
+      <color-picker v-model="cellColor" inputId="cp-hex" format="hex" />
     </div>
+
+    <prime-button
+        label="Скачать схему картинкой"
+        class="mt-6"
+        @click="exportImage"
+    />
   </div>
 </template>
 
