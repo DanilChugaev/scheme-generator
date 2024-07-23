@@ -13,32 +13,30 @@ export function useSettings() {
   const { stage } = useWorkspace()
 
   const hasCellOffset = useStorage('has-cell-offset', false)
-  const isSquare = useStorage('is-square', true)
-  const schemeWidth = useStorage('scheme-width', 10)
-  const schemeHeight = useStorage('scheme-height', 20)
+  const schemeWidth = useStorage('scheme-width', 30)
+  const schemeHeight = useStorage('scheme-height', 10)
   const cellColor = useStorage('cell-color', '6466f1')
 
   const list = ref([])
 
   const isDark = ref(toggleDarkMode())
-  const squareSize = ref(50)
-  const rectSize = ref(75)
+  const cellSize = ref(50)
   const initialCellFill = ref('#add8e6')
   const strokeColor = ref('black')
   const strokeWidth = ref(1)
   const cornerRadius = ref(5)
 
-  // учесть вертикальная ли схема или горизонатальная
-
-  const cellWidth = computed(() => squareSize.value)
-  const cellHeight = computed(() => isSquare.value ? squareSize.value : rectSize.value)
+  const cellWidth = computed(() => cellSize.value)
+  const cellHeight = computed(() => cellSize.value)
+  const cellOffset = computed(() => hasCellOffset.value ? cellSize.value / 2 : 0)
   const textColor = computed(() => isDark.value ? '#adbac7' : '#1F2328')
-  const textOffset = computed(() => isSquare.value ? 0 : 10)
 
   watchEffect(() => {
     const result = []
 
     for (let h = 0; h <= schemeHeight.value; h++) {
+      const resultOffset = h % 2 === 0 ? cellOffset.value : 0
+
       for (let w = 0; w <= schemeWidth.value; w++) {
         const id = `h_${h}-w_${w}`
 
@@ -47,7 +45,7 @@ export function useSettings() {
             type: 'text',
             id,
             x: cellWidth.value * w - 10,
-            y: h + cellHeight.value * h + textOffset.value,
+            y: h + cellHeight.value * h,
             text: w + h,
             fontSize: 18,
             fontFamily: 'sans-serif',
@@ -60,7 +58,7 @@ export function useSettings() {
           result.push({
             type: 'rect',
             id,
-            x: cellWidth.value * w,
+            x: cellWidth.value * w + resultOffset,
             y: h + cellHeight.value * h,
             width: cellWidth.value,
             height: cellHeight.value,
@@ -108,7 +106,6 @@ export function useSettings() {
   return {
     list,
     isDark,
-    isSquare,
     hasCellOffset,
     groupConfig,
     schemeWidth,

@@ -9,7 +9,6 @@ import { useSettings } from '../../composables/useSettings'
 
 const {
   isDark,
-  isSquare,
   hasCellOffset,
   schemeWidth,
   schemeHeight,
@@ -36,12 +35,6 @@ const {
     </div>
 
     <div class="flex justify-between items-center gap-4">
-      <h3>Квадратные</h3>
-
-      <checkbox v-model="isSquare" :binary="true" />
-    </div>
-
-    <div class="flex justify-between items-center gap-4">
       <h3>Ширина схемы</h3>
 
       <input-text class="max-w-[100px]" type="number" v-model="schemeWidth" />
@@ -61,7 +54,7 @@ const {
 
     <prime-button
         label="Скачать схему картинкой"
-        class="mt-6"
+        class="mt-auto"
         @click="exportImage"
     />
   </div>
