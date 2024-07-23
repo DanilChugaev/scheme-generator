@@ -81,6 +81,10 @@ export function useSettings() {
     colorHistory.value = [...new Set([...colorHistory.value, color])]
   }
 
+  function removeColorFromHistory(color: string) {
+    colorHistory.value = colorHistory.value.filter(item => item !== color)
+  }
+
   const paintCell = async (id: string) => {
     const cell = list.value.find(item => item.id === id)
 
@@ -122,5 +126,6 @@ export function useSettings() {
     toggleDarkMode,
     paintCell,
     exportImage,
+    removeColorFromHistory,
   }
 }

@@ -1,10 +1,13 @@
 <script setup lang="ts">
+import { ref } from 'vue'
+
 import Checkbox from 'primevue/checkbox'
 import ToggleSwitch from 'primevue/toggleswitch'
 import InputText from 'primevue/inputtext'
 import ColorPicker from 'primevue/colorpicker'
 import PrimeButton from 'primevue/button'
 import InputIcon from 'primevue/inputicon'
+import ContextMenu from 'primevue/contextmenu'
 
 import { useSettings } from '../../composables/useSettings'
 
@@ -16,8 +19,24 @@ const {
   cellColor,
   colorHistory,
   toggleDarkMode,
+  removeColorFromHistory,
   exportImage,
 } = useSettings()
+
+const menu = ref(null)
+const selectedColor = ref('')
+const items = ref([
+  {
+    label: 'Удалить этот цвет',
+    command: () => removeColorFromHistory(selectedColor.value),
+  },
+])
+
+function onColorRightClick(event, color) {
+  selectedColor.value = color
+
+  menu.value?.show(event)
+}
 </script>
 
 <template>
@@ -63,13 +82,16 @@ const {
 
       <div class="flex flex-wrap gap-4">
         <span
-            v-for="item in colorHistory"
-            :key="item"
+            v-for="color in colorHistory"
+            :key="color"
             class="p-colorpicker-preview"
+            :data-color="color"
             :style="[
-                `background-color: #${item}`
+                `background-color: #${color}`
             ]"
-            @click="cellColor = item"
+            @contextmenu="onColorRightClick($event, color)"
+            aria-haspopup="true"
+            @click="cellColor = color"
         ></span>
         <input-icon
             v-if="colorHistory.length > 1"
@@ -77,6 +99,7 @@ const {
             title="Очистить историю"
             @click="colorHistory = [cellColor]"
         />
+        <context-menu v-if="colorHistory.length > 1" ref="menu" :model="items" />
       </div>
     </div>
 
