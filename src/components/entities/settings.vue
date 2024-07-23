@@ -8,6 +8,7 @@ import ColorPicker from 'primevue/colorpicker'
 import PrimeButton from 'primevue/button'
 import InputIcon from 'primevue/inputicon'
 import ContextMenu from 'primevue/contextmenu'
+import Slider from 'primevue/slider'
 
 import { useSettings } from '../../composables/useSettings'
 
@@ -17,9 +18,11 @@ const {
   schemeWidth,
   schemeHeight,
   cellColor,
+  cellWidth,
   colorHistory,
   toggleDarkMode,
   removeColorFromHistory,
+  clearColorHistory,
   exportImage,
 } = useSettings()
 
@@ -53,6 +56,12 @@ function onColorRightClick(event, color) {
       <h3>Со смещением</h3>
 
       <checkbox v-model="hasCellOffset" :binary="true" />
+    </div>
+
+    <div class="item">
+      <h3>Внешний вид ({{ cellWidth }})</h3>
+
+      <slider class="w-[10rem]" v-model="cellWidth" :step="5" :min="50" :max="100" />
     </div>
 
     <div class="item">
@@ -97,7 +106,7 @@ function onColorRightClick(event, color) {
             v-if="colorHistory.length > 1"
             class="icon pi pi-times"
             title="Очистить историю"
-            @click="colorHistory = [cellColor]"
+            @click="clearColorHistory"
         />
         <context-menu v-if="colorHistory.length > 1" ref="menu" :model="items" />
       </div>

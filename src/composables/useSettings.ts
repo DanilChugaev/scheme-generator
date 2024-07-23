@@ -17,19 +17,18 @@ export function useSettings() {
   const schemeHeight = useStorage('scheme-height', 10)
   const cellColor = useStorage('cell-color', '6466f1')
   const colorHistory = useStorage('color-history', [cellColor.value])
+  const cellWidth = useStorage('color-width', 50)
 
   const list = ref([])
 
   const isDark = ref(toggleDarkMode())
-  const cellSize = ref(50)
+  const cellHeight = ref(50)
   const initialCellFill = ref('#add8e6')
   const strokeColor = ref('black')
   const strokeWidth = ref(1)
   const cornerRadius = ref(5)
 
-  const cellWidth = computed(() => cellSize.value)
-  const cellHeight = computed(() => cellSize.value)
-  const cellOffset = computed(() => hasCellOffset.value ? cellSize.value / 2 : 0)
+  const cellOffset = computed(() => hasCellOffset.value ? cellWidth.value / 2 : 0)
   const textColor = computed(() => isDark.value ? '#adbac7' : '#1F2328')
 
   watch(cellColor, useDebounceFn(_updateColorHistory, 300))
@@ -47,14 +46,14 @@ export function useSettings() {
           result.push({
             type: 'text',
             id,
-            x: cellWidth.value * w - 10,
-            y: h + cellHeight.value * h,
+            x: cellWidth.value * w,
+            y: h + cellHeight.value * h + 5,
             text: w + h,
-            fontSize: 18,
+            fontSize: 16,
             fontFamily: 'sans-serif',
             fill: textColor.value,
-            width: 70,
-            padding: 15,
+            width: cellWidth.value,
+            padding: 10,
             align: 'center',
           })
         } else {
@@ -82,7 +81,16 @@ export function useSettings() {
   }
 
   function removeColorFromHistory(color: string) {
-    colorHistory.value = colorHistory.value.filter(item => item !== color)
+    if (colorHistory.value.length > 2) {
+      colorHistory.value = colorHistory.value.filter(item => item !== color)
+    } else {
+      clearColorHistory()
+    }
+  }
+
+  function clearColorHistory() {
+    colorHistory.value = []
+    colorHistory.value.push(cellColor.value)
   }
 
   const paintCell = async (id: string) => {
@@ -121,10 +129,13 @@ export function useSettings() {
     groupConfig,
     schemeWidth,
     schemeHeight,
+    cellWidth,
+    cellHeight,
     cellColor,
     colorHistory,
     toggleDarkMode,
     paintCell,
+    clearColorHistory,
     exportImage,
     removeColorFromHistory,
   }
