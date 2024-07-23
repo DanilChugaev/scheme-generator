@@ -6,6 +6,7 @@ import PrimeVue from 'primevue/config'
 import Aura from '@primevue/themes/aura'
 import { definePreset } from '@primevue/themes'
 import VueKonva from 'vue-konva'
+import 'primeicons/primeicons.css'
 
 const app = createApp(App);
 

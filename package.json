@@ -18,6 +18,7 @@
     "postcss": "^8.4.39",
     "postcss-custom-media": "^10.0.8",
     "postcss-nested": "^6.2.0",
+    "primeicons": "^7.0.0",
     "primevue": "^4.0.0",
     "vue": "^3.4.33",
     "vue-konva": "^3.0.2",

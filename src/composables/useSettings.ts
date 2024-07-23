@@ -1,5 +1,5 @@
-import { computed, inject, reactive, ref, watchEffect } from 'vue'
-import { useStorage, useDateFormat, useNow } from '@vueuse/core'
+import { computed, inject, reactive, watch, ref, watchEffect } from 'vue'
+import { useStorage, useDateFormat, useNow, useDebounceFn } from '@vueuse/core'
 import { useWorkspace } from './useWorkspace'
 
 const groupConfig = reactive({
@@ -16,6 +16,7 @@ export function useSettings() {
   const schemeWidth = useStorage('scheme-width', 30)
   const schemeHeight = useStorage('scheme-height', 10)
   const cellColor = useStorage('cell-color', '6466f1')
+  const colorHistory = useStorage('color-history', [cellColor.value])
 
   const list = ref([])
 
@@ -30,6 +31,8 @@ export function useSettings() {
   const cellHeight = computed(() => cellSize.value)
   const cellOffset = computed(() => hasCellOffset.value ? cellSize.value / 2 : 0)
   const textColor = computed(() => isDark.value ? '#adbac7' : '#1F2328')
+
+  watch(cellColor, useDebounceFn(_updateColorHistory, 300))
 
   watchEffect(() => {
     const result = []
@@ -74,6 +77,10 @@ export function useSettings() {
     list.value = result
   })
 
+  function _updateColorHistory(color: string) {
+    colorHistory.value = [...new Set([...colorHistory.value, color])]
+  }
+
   const paintCell = async (id: string) => {
     const cell = list.value.find(item => item.id === id)
 
@@ -111,6 +118,7 @@ export function useSettings() {
     schemeWidth,
     schemeHeight,
     cellColor,
+    colorHistory,
     toggleDarkMode,
     paintCell,
     exportImage,
