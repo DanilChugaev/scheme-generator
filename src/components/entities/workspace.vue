@@ -14,7 +14,7 @@ const {
   setCursorMove,
 } = useWorkspace()
 const {
-  list,
+  scheme,
   groupConfig,
   paintCell,
 } = useSettings()
@@ -59,7 +59,7 @@ onMounted(() => {
             @mouseover="setCursorPointer"
             @mouseleave="setCursorDefault"
         >
-          <template v-for="item in list">
+          <template v-for="item of scheme.values()">
             <template v-if="item.type === 'text'">
               <v-text
                   v-if="item.text != '0'"

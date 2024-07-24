@@ -18,8 +18,7 @@ export function useSettings() {
   const cellColor = useStorage('cell-color', '6466f1')
   const colorHistory = useStorage('color-history', [cellColor.value])
   const cellWidth = useStorage('color-width', 50)
-
-  const list = ref([])
+  const scheme = useStorage('scheme', new Map())
 
   const isDark = ref(toggleDarkMode())
   const cellHeight = ref(50)
@@ -34,8 +33,6 @@ export function useSettings() {
   watch(cellColor, useDebounceFn(_updateColorHistory, 300))
 
   watchEffect(() => {
-    const result = []
-
     for (let h = 0; h <= schemeHeight.value; h++) {
       const resultOffset = h % 2 === 0 ? cellOffset.value : 0
 
@@ -43,37 +40,53 @@ export function useSettings() {
         const id = `h_${h}-w_${w}`
 
         if (w === 0 || h === 0) {
-          result.push({
-            type: 'text',
-            id,
-            x: cellWidth.value * w,
-            y: h + cellHeight.value * h + 5,
-            text: w + h,
-            fontSize: 16,
-            fontFamily: 'sans-serif',
-            fill: textColor.value,
-            width: cellWidth.value,
-            padding: 10,
-            align: 'center',
-          })
+          if (scheme.value.get(id)) {
+            scheme.value.set(id, {
+              ...scheme.value.get(id),
+              x: cellWidth.value * w,
+              y: h + cellHeight.value * h + 5,
+              width: cellWidth.value,
+            })
+          } else {
+            scheme.value.set(id, {
+              type: 'text',
+              id,
+              x: cellWidth.value * w,
+              y: h + cellHeight.value * h + 5,
+              text: w + h,
+              fontSize: 16,
+              fontFamily: 'sans-serif',
+              fill: textColor.value,
+              width: cellWidth.value,
+              padding: 10,
+              align: 'center',
+            })
+          }
         } else {
-          result.push({
-            type: 'rect',
-            id,
-            x: cellWidth.value * w + resultOffset,
-            y: h + cellHeight.value * h,
-            width: cellWidth.value,
-            height: cellHeight.value,
-            fill: initialCellFill.value,
-            stroke: strokeColor.value,
-            strokeWidth: strokeWidth.value,
-            cornerRadius: cornerRadius.value,
-          })
+          if (scheme.value.get(id)) {
+            scheme.value.set(id, {
+              ...scheme.value.get(id),
+              x: cellWidth.value * w + resultOffset,
+              y: h + cellHeight.value * h,
+              width: cellWidth.value,
+            })
+          } else {
+            scheme.value.set(id, {
+              type: 'rect',
+              id,
+              x: cellWidth.value * w + resultOffset,
+              y: h + cellHeight.value * h,
+              width: cellWidth.value,
+              height: cellHeight.value,
+              fill: initialCellFill.value,
+              stroke: strokeColor.value,
+              strokeWidth: strokeWidth.value,
+              cornerRadius: cornerRadius.value,
+            })
+          }
         }
       }
     }
-
-    list.value = result
   })
 
   function _updateColorHistory(color: string) {
@@ -94,7 +107,7 @@ export function useSettings() {
   }
 
   const paintCell = async (id: string) => {
-    const cell = list.value.find(item => item.id === id)
+    const cell = scheme.value.get(id)
 
     if (!cell) {
       return
@@ -112,7 +125,6 @@ export function useSettings() {
     document.body.appendChild(link)
     link.click()
     document.body.removeChild(link)
-    // delete link
   }
 
   const exportImage = () => {
@@ -123,7 +135,7 @@ export function useSettings() {
   }
 
   return {
-    list,
+    scheme,
     isDark,
     hasCellOffset,
     groupConfig,
