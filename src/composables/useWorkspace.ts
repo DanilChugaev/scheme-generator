@@ -18,13 +18,7 @@ export function useWorkspace() {
     }
 
     // how to scale? Zoom in? Or zoom out?
-    let direction = event.evt.deltaY > 0 ? -1 : 1
-
-    // when we zoom on trackpad, e.evt.ctrlKey is true
-    // in that case lets revert direction
-    if (event.evt.ctrlKey) {
-      direction = -direction
-    }
+    const direction = event.evt.deltaY > 0 ? -1 : 1
 
     const newScale = direction > 0 ? oldScale * scaleBy : oldScale / scaleBy
 
