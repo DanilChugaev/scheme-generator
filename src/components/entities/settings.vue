@@ -133,21 +133,22 @@ const checkClearScheme = (event) => {
       </div>
     </div>
 
+    <prime-button
+        raised
+        label="Скачать схему картинкой"
+        @click="exportImage"
+    />
+
     <div class="flex flex-col gap-4 mt-auto">
-      <prime-button
-          severity="danger" outlined
-          label="Сбросить всю схему"
-          @click="checkClearScheme"
-      />
       <prime-button
           severity="secondary"
           label="Сбросить местоположение схемы"
           @click="clearSchemePosition"
       />
       <prime-button
-          raised
-          label="Скачать схему картинкой"
-          @click="exportImage"
+          severity="danger" outlined
+          label="Сбросить всю схему"
+          @click="checkClearScheme"
       />
     </div>
   </div>
