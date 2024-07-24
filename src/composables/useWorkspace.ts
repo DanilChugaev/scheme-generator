@@ -37,8 +37,23 @@ export function useWorkspace() {
     stage.value.position(newPos)
   }
 
+  function setCursorPointer() {
+    stage.value.container().style.cursor = 'pointer'
+  }
+
+  function setCursorDefault() {
+    stage.value.container().style.cursor = 'default'
+  }
+
+  function setCursorMove() {
+    stage.value.container().style.cursor = 'move'
+  }
+
   return {
     stage,
     scaling,
+    setCursorPointer,
+    setCursorDefault,
+    setCursorMove,
   }
 }

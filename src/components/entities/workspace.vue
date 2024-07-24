@@ -6,7 +6,13 @@ import { useSettings } from '../../composables/useSettings'
 
 const container = ref(null)
 const { width, height } = useElementSize(container)
-const { stage, scaling } = useWorkspace()
+const {
+  stage,
+  scaling,
+  setCursorPointer,
+  setCursorDefault,
+  setCursorMove,
+} = useWorkspace()
 const {
   list,
   groupConfig,
@@ -29,7 +35,13 @@ onMounted(() => {
   <div ref="container" class="h-full w-full">
     <v-stage :config="configKonva">
       <v-layer>
-        <v-group :config="groupConfig">
+        <v-group
+            :config="groupConfig"
+            @dragstart="setCursorMove"
+            @dragend="setCursorPointer"
+            @mouseover="setCursorPointer"
+            @mouseleave="setCursorDefault"
+        >
           <template v-for="item in list">
             <template v-if="item.type === 'text'">
               <v-text
