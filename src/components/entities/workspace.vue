@@ -23,6 +23,17 @@ const configKonva = reactive({
   width,
   height,
 })
+const group = ref(null)
+
+function onDragStart() {
+  group.value.getNode().cache()
+  setCursorMove()
+}
+
+function onDragEnd() {
+  group.value.getNode().clearCache()
+  setCursorPointer()
+}
 
 onMounted(() => {
   stage.value = window.Konva.stages[0]
@@ -36,9 +47,15 @@ onMounted(() => {
     <v-stage :config="configKonva">
       <v-layer>
         <v-group
+            ref="group"
             :config="groupConfig"
-            @dragstart="setCursorMove"
-            @dragend="setCursorPointer"
+            @dragstart="onDragStart"
+            @dragend="onDragEnd"
+            @dragover="console.log('dragover')"
+            @dragenter="console.log('dragenter')"
+            @dragleave="console.log('dragleave')"
+            @drag="console.log('drag')"
+            @drop="console.log('drop')"
             @mouseover="setCursorPointer"
             @mouseleave="setCursorDefault"
         >
