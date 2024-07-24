@@ -32,6 +32,8 @@ export function useSettings() {
   watch(cellColor, useDebounceFn(_updateColorHistory, 300))
 
   watchEffect(() => {
+    const result = new Map()
+
     for (let h = 0; h <= schemeHeight.value; h++) {
       const resultOffset = h % 2 === 0 ? cellOffset.value : 0
 
@@ -40,14 +42,15 @@ export function useSettings() {
 
         if (w === 0 || h === 0) {
           if (scheme.value.get(id)) {
-            scheme.value.set(id, {
+            result.set(id, {
               ...scheme.value.get(id),
               x: cellWidth.value * w,
               y: h + cellHeight.value * h + 5,
               width: cellWidth.value,
+              fill: textColor.value,
             })
           } else {
-            scheme.value.set(id, {
+            result.set(id, {
               type: 'text',
               id,
               x: cellWidth.value * w,
@@ -63,14 +66,14 @@ export function useSettings() {
           }
         } else {
           if (scheme.value.get(id)) {
-            scheme.value.set(id, {
+            result.set(id, {
               ...scheme.value.get(id),
               x: cellWidth.value * w + resultOffset,
               y: h + cellHeight.value * h,
               width: cellWidth.value,
             })
           } else {
-            scheme.value.set(id, {
+            result.set(id, {
               type: 'rect',
               id,
               x: cellWidth.value * w + resultOffset,
@@ -86,6 +89,8 @@ export function useSettings() {
         }
       }
     }
+
+    scheme.value = result
   })
 
   function _updateColorHistory(color: string) {
@@ -139,7 +144,7 @@ export function useSettings() {
   }
 
   function clearScheme() {
-    scheme.value = new Map()
+    scheme.value.clear()
     schemeWidth.value = 20
     schemeHeight.value = 10
   }

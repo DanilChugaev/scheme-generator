@@ -147,7 +147,7 @@ const checkClearScheme = (event) => {
       />
       <prime-button
           severity="danger" outlined
-          label="Сбросить всю схему"
+          label="Сбросить схему"
           @click="checkClearScheme"
       />
     </div>
