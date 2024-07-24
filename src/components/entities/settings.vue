@@ -9,8 +9,12 @@ import PrimeButton from 'primevue/button'
 import InputIcon from 'primevue/inputicon'
 import ContextMenu from 'primevue/contextmenu'
 import Slider from 'primevue/slider'
+import ConfirmPopup from 'primevue/confirmpopup'
 
+import { useConfirm } from 'primevue/useconfirm'
 import { useSettings } from '../../composables/useSettings'
+
+const confirm = useConfirm()
 
 const {
   isDark,
@@ -23,6 +27,8 @@ const {
   toggleDarkMode,
   removeColorFromHistory,
   clearColorHistory,
+  clearScheme,
+  clearSchemePosition,
   exportImage,
 } = useSettings()
 
@@ -40,9 +46,24 @@ function onColorRightClick(event, color) {
 
   menu.value?.show(event)
 }
+
+const checkClearScheme = (event) => {
+  confirm.require({
+    target: event.currentTarget,
+    message: 'Вы точно хотите очистить всю схему',
+    icon: 'pi pi-info-circle',
+    rejectClass: 'p-button-secondary p-button-outlined p-button-sm',
+    acceptClass: 'p-button-danger p-button-sm',
+    rejectLabel: 'Нет',
+    acceptLabel: 'Да',
+    accept: () => clearScheme(),
+  })
+}
 </script>
 
 <template>
+  <confirm-popup />
+
   <div class="h-full w-full max-w-[400px] border-l border-sky-500 flex flex-col gap-4 p-6">
     <h2>Настройки</h2>
 
@@ -112,11 +133,23 @@ function onColorRightClick(event, color) {
       </div>
     </div>
 
-    <prime-button
-        label="Скачать схему картинкой"
-        class="mt-auto"
-        @click="exportImage"
-    />
+    <div class="flex flex-col gap-4 mt-auto">
+      <prime-button
+          severity="danger" outlined
+          label="Сбросить всю схему"
+          @click="checkClearScheme"
+      />
+      <prime-button
+          severity="secondary"
+          label="Сбросить местоположение схемы"
+          @click="clearSchemePosition"
+      />
+      <prime-button
+          raised
+          label="Скачать схему картинкой"
+          @click="exportImage"
+      />
+    </div>
   </div>
 </template>
 

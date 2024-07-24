@@ -17,6 +17,7 @@ const {
   scheme,
   groupConfig,
   paintCell,
+  saveSchemePosition,
 } = useSettings()
 
 const configKonva = reactive({
@@ -30,9 +31,13 @@ function onDragStart() {
   setCursorMove()
 }
 
-function onDragEnd() {
+function onDragEnd(event) {
   group.value.getNode().clearCache()
   setCursorPointer()
+  saveSchemePosition({
+    x: event.target.attrs.x,
+    y: event.target.attrs.y,
+  })
 }
 
 onMounted(() => {

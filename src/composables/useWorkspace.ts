@@ -6,6 +6,7 @@ export function useWorkspace() {
   const scaleBy = 1.2
 
   function scaling(event) {
+    // TODO: добавить здесь кэширование
     // stop default scrolling
     event.evt.preventDefault()
 
@@ -19,16 +20,13 @@ export function useWorkspace() {
 
     // how to scale? Zoom in? Or zoom out?
     const direction = event.evt.deltaY > 0 ? -1 : 1
-
     const newScale = direction > 0 ? oldScale * scaleBy : oldScale / scaleBy
 
     stage.value.scale({ x: newScale, y: newScale })
-
-    const newPos = {
+    stage.value.position({
       x: pointer.x - mousePointTo.x * newScale,
       y: pointer.y - mousePointTo.y * newScale,
-    }
-    stage.value.position(newPos)
+    })
   }
 
   function setCursorPointer() {

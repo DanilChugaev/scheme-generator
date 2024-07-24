@@ -1,19 +1,18 @@
-import { computed, inject, reactive, watch, ref, watchEffect } from 'vue'
+import { computed, inject, watch, ref, watchEffect } from 'vue'
 import { useStorage, useDateFormat, useNow, useDebounceFn } from '@vueuse/core'
 import { useWorkspace } from './useWorkspace'
-
-const groupConfig = reactive({
-  x: 20,
-  y: 20,
-  draggable: true,
-})
 
 export function useSettings() {
   const toggleDarkMode = inject('toggleDarkMode')
   const { stage } = useWorkspace()
 
+  const groupConfig = useStorage('group-config', {
+    x: 20,
+    y: 20,
+    draggable: true,
+  })
   const hasCellOffset = useStorage('has-cell-offset', false)
-  const schemeWidth = useStorage('scheme-width', 30)
+  const schemeWidth = useStorage('scheme-width', 20)
   const schemeHeight = useStorage('scheme-height', 10)
   const cellColor = useStorage('cell-color', '6466f1')
   const colorHistory = useStorage('color-history', [cellColor.value])
@@ -106,7 +105,7 @@ export function useSettings() {
     colorHistory.value.push(cellColor.value)
   }
 
-  const paintCell = async (id: string) => {
+  async function paintCell(id: string) {
     const cell = scheme.value.get(id)
 
     if (!cell) {
@@ -127,11 +126,34 @@ export function useSettings() {
     document.body.removeChild(link)
   }
 
-  const exportImage = () => {
+  function exportImage() {
     const dataURL = stage.value.toDataURL({ pixelRatio: 3 })
     const formattedTime = useDateFormat(useNow(), 'DD-MM-YYYY HH-mm-ss')
 
     downloadURI(dataURL, `${formattedTime.value}.png`)
+  }
+
+  function saveSchemePosition({ x, y }) {
+    groupConfig.value.x = x
+    groupConfig.value.y = y
+  }
+
+  function clearScheme() {
+    scheme.value = new Map()
+    schemeWidth.value = 20
+    schemeHeight.value = 10
+  }
+
+  function clearSchemePosition() {
+    const position = 20
+
+    stage.value.scale({ x: 1, y: 1 })
+    stage.value.position({
+      x: position,
+      y: position,
+    })
+    groupConfig.value.x = position
+    groupConfig.value.y = position
   }
 
   return {
@@ -150,5 +172,8 @@ export function useSettings() {
     clearColorHistory,
     exportImage,
     removeColorFromHistory,
+    saveSchemePosition,
+    clearScheme,
+    clearSchemePosition,
   }
 }
