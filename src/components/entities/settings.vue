@@ -10,10 +10,15 @@ import InputIcon from 'primevue/inputicon'
 import ContextMenu from 'primevue/contextmenu'
 import Slider from 'primevue/slider'
 import ConfirmPopup from 'primevue/confirmpopup'
+import PrimeDialog from 'primevue/dialog'
+import PrimeToast from 'primevue/toast'
+import PrimeDropdown from 'primevue/dropdown'
 
+import { useToast } from 'primevue/usetoast'
 import { useConfirm } from 'primevue/useconfirm'
 import { useSettings } from '../../composables/useSettings'
 
+const toast = useToast()
 const confirm = useConfirm()
 
 const {
@@ -25,6 +30,11 @@ const {
   cellWidth,
   colorHistory,
   toggleDarkMode,
+  isSaveToFavoriteButtonVisible,
+  favorites,
+  selectedScheme,
+  saveSchemeToFavoriteStorage,
+  restoreSchemeFromStorage,
   removeColorFromHistory,
   clearColorHistory,
   clearScheme,
@@ -35,6 +45,8 @@ const {
 
 const menu = ref(null)
 const selectedColor = ref('')
+const schemeName = ref('')
+const isVisibleModalForSaveToFavorite = ref(false)
 
 const filteredContextMenuItems = computed(() => [
   {
@@ -67,18 +79,82 @@ const checkClearScheme = (event) => {
     accept: () => clearScheme(),
   })
 }
+
+const showSuccessSave = () => {
+  toast.add({
+    severity: 'success',
+    summary: 'Схема добавлена в избранное',
+    detail: `Имя схемы: ${schemeName.value}`,
+    life: 3000,
+  })
+}
+
+const checkSaveSchemeIfExist = (event) => {
+  confirm.require({
+    target: event.currentTarget,
+    message: 'Схема с таким названием существует, хотите перезаписать?',
+    icon: 'pi pi-info-circle',
+    rejectClass: 'p-button-secondary p-button-outlined p-button-sm',
+    acceptClass: 'p-button-danger p-button-sm',
+    rejectLabel: 'Нет',
+    acceptLabel: 'Да',
+    accept: () => {
+      handlerAfterAcceptSaveSchemeToFavorite()
+    },
+  })
+}
+
+function saveSchemeToFavorite(event) {
+  if (!schemeName.value) return
+
+  if (favorites.value.includes(schemeName.value)) {
+    checkSaveSchemeIfExist(event)
+  } else {
+    handlerAfterAcceptSaveSchemeToFavorite()
+  }
+}
+
+function handlerAfterAcceptSaveSchemeToFavorite() {
+  saveSchemeToFavoriteStorage(schemeName.value)
+  showSuccessSave()
+
+  isVisibleModalForSaveToFavorite.value = false
+  schemeName.value = ''
+}
 </script>
 
 <template>
+  <prime-toast position="bottom-center" />
   <confirm-popup />
 
+  <prime-dialog v-model:visible="isVisibleModalForSaveToFavorite" modal header="Введите имя схемы" :style="{ width: '25rem' }">
+    <input-text v-model="schemeName" class="w-full" autocomplete="off" @keydown.enter="saveSchemeToFavorite" />
+
+    <div class="flex justify-end gap-2 mt-3">
+      <prime-button type="button" label="Отмена" severity="secondary" @click="isVisibleModalForSaveToFavorite = false" />
+      <prime-button type="button" label="Сохранить" @click="saveSchemeToFavorite" />
+    </div>
+  </prime-dialog>
+
   <div class="h-full w-full max-w-[400px] border-l border-sky-500 flex flex-col gap-4 p-6">
-    <h2>Настройки</h2>
+    <h2><b>Настройки</b></h2>
 
     <div class="item">
       <h3>Темная тема</h3>
 
       <toggle-switch v-model="isDark" @change="toggleDarkMode" />
+    </div>
+
+    <div v-if="favorites.length" class="item item--vertical">
+      <h3>Избранное</h3>
+
+      <prime-dropdown
+          v-model="selectedScheme"
+          :options="favorites"
+          placeholder="Выберите схему"
+          class="w-full md:w-14rem"
+          @update:model-value="restoreSchemeFromStorage($event)"
+      />
     </div>
 
     <div class="item">
@@ -143,19 +219,26 @@ const checkClearScheme = (event) => {
 
     <prime-button
         raised
-        label="Скачать схему картинкой"
+        label="Скачать картинкой"
         @click="exportImage"
+    />
+
+    <prime-button
+        v-if="isSaveToFavoriteButtonVisible"
+        label="Сохранить в избранное"
+        severity="secondary"
+        @click="isVisibleModalForSaveToFavorite = true"
     />
 
     <div class="flex flex-col gap-4 mt-auto">
       <prime-button
           severity="secondary"
-          label="Сбросить местоположение схемы"
+          label="Сбросить местоположение"
           @click="clearSchemePosition"
       />
       <prime-button
           severity="danger" outlined
-          label="Сбросить схему"
+          label="Сбросить всю схему"
           @click="checkClearScheme"
       />
     </div>

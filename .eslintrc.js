@@ -17,6 +17,7 @@ module.exports = {
   },
   'rules': {
     'vue/no-multiple-template-root': 0,
+    'vue/no-v-model-argument': 0,
     '@typescript-eslint/ban-ts-comment': 0,
     '@typescript-eslint/no-explicit-any': 0,
     'vue/multi-word-component-names': 0,

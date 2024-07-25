@@ -25,6 +25,8 @@ export function useSettings() {
     draggable: true,
   })
   const hasCellOffset = useStorage('has-cell-offset', false)
+  // TODO: после восстановления схемы из урла делать кнопку активной
+  const isSaveToFavoriteButtonVisible = useStorage('is-save-to-favorite-button-visible', false)
   const schemeWidth = useStorage('scheme-width', INITIAL_SCHEME_WIDTH)
   const schemeHeight = useStorage('scheme-height', INITIAL_SCHEME_HEIGHT)
   const cellColor = useStorage('cell-color', '6466f1')
@@ -33,11 +35,13 @@ export function useSettings() {
   const scheme = useStorage('scheme', new Map())
   const cellFill = useStorage('cell-fill', INITIAL_CELL_FILL)
   const strokeColor = useStorage('stroke-color', INITIAL_STROKE_COLOR)
+  const favorites = useStorage<string[]>('favorites', [])
 
   const isDark = ref(toggleDarkMode())
   const cellHeight = ref(INITIAL_CELL_WIDTH)
   const strokeWidth = ref(STROKE_WIDTH)
   const cornerRadius = ref(CORNER_RADIUS)
+  const selectedScheme = ref('')
 
   const cellOffset = computed(() => hasCellOffset.value ? cellWidth.value / 2 : 0)
   const textColor = computed(() => isDark.value ? TEXT_COLOR_FOR_DARK_THEME : TEXT_COLOR_FOR_LIGHT_THEME)
@@ -124,6 +128,11 @@ export function useSettings() {
   function clearColorHistory() {
     colorHistory.value = []
     colorHistory.value.push(cellColor.value)
+    clearSelectedSchemeName()
+  }
+
+  function clearSelectedSchemeName() {
+    selectedScheme.value = ''
   }
 
   async function paintCell(id: string) {
@@ -137,6 +146,8 @@ export function useSettings() {
 
     cell.fill = cell.fill === newColor ? cellFill.value : newColor
     cell.isFilled = true
+    isSaveToFavoriteButtonVisible.value = true
+    clearSelectedSchemeName()
   }
 
   function downloadURI(uri, name) {
@@ -166,6 +177,8 @@ export function useSettings() {
     schemeHeight.value = INITIAL_SCHEME_HEIGHT
     cellFill.value = INITIAL_CELL_FILL
     strokeColor.value = INITIAL_STROKE_COLOR
+    isSaveToFavoriteButtonVisible.value = false
+    clearSelectedSchemeName()
   }
 
   function clearSchemePosition() {
@@ -189,6 +202,31 @@ export function useSettings() {
     strokeColor.value = `#${(parseInt(color, 16) ^ 0xFFFFFF | 0x1000000).toString(16).substring(1)}`
   }
 
+  function saveSchemeToFavoriteStorage(name: string) {
+    favorites.value = [...new Set([...favorites.value, name])]
+    useStorage(name, {
+      scheme: [...scheme.value],
+      hasCellOffset: hasCellOffset.value,
+      cellWidth: cellWidth.value,
+      schemeWidth: schemeWidth.value,
+      schemeHeight: schemeHeight.value,
+      cellColor: cellColor.value,
+      colorHistory: colorHistory.value,
+    })
+  }
+
+  function restoreSchemeFromStorage(name) {
+    const schemeData = useStorage(name, {})
+
+    scheme.value = new Map(schemeData.value.scheme)
+    hasCellOffset.value = schemeData.value.hasCellOffset
+    cellWidth.value = schemeData.value.cellWidth
+    schemeWidth.value = schemeData.value.schemeWidth
+    schemeHeight.value = schemeData.value.schemeHeight
+    cellColor.value = schemeData.value.cellColor
+    colorHistory.value = schemeData.value.colorHistory
+  }
+
   return {
     scheme,
     isDark,
@@ -201,6 +239,11 @@ export function useSettings() {
     cellColor,
     colorHistory,
     toggleDarkMode,
+    isSaveToFavoriteButtonVisible,
+    favorites,
+    selectedScheme,
+    saveSchemeToFavoriteStorage,
+    restoreSchemeFromStorage,
     paintCell,
     clearColorHistory,
     exportImage,

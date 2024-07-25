@@ -7,7 +7,8 @@ import Aura from '@primevue/themes/aura'
 import { definePreset } from '@primevue/themes'
 import VueKonva from 'vue-konva'
 import 'primeicons/primeicons.css'
-import ConfirmationService from 'primevue/confirmationservice';
+import ConfirmationService from 'primevue/confirmationservice'
+import ToastService from 'primevue/toastservice'
 
 const app = createApp(App);
 
@@ -35,6 +36,7 @@ const MyPreset = definePreset(Aura, {
 });
 
 app
+  .use(ToastService)
   .use(ConfirmationService)
   .use(VueKonva)
   .use(PrimeVue, {
