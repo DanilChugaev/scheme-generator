@@ -186,7 +186,7 @@ export function useSettings() {
   function setAsBackground(color: string) {
     cellFill.value = `#${color}`
     // инвертируем границы ячеек
-    strokeColor.value = (parseInt(color, 16) ^ 0xFFFFFF | 0x1000000).toString(16).substring(1)
+    strokeColor.value = `#${(parseInt(color, 16) ^ 0xFFFFFF | 0x1000000).toString(16).substring(1)}`
   }
 
   return {
