@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 
 import Checkbox from 'primevue/checkbox'
 import ToggleSwitch from 'primevue/toggleswitch'
@@ -35,16 +35,19 @@ const {
 
 const menu = ref(null)
 const selectedColor = ref('')
-const items = ref([
+
+const filteredContextMenuItems = computed(() => [
   {
     label: 'Удалить этот цвет',
     command: () => removeColorFromHistory(selectedColor.value),
+    isVisible: colorHistory.value.length > 1,
   },
   {
     label: 'Использовать как фон',
     command: () => setAsBackground(selectedColor.value),
+    isVisible: true,
   },
-])
+].filter(item => item.isVisible))
 
 function onColorRightClick(event, color) {
   selectedColor.value = color
@@ -134,7 +137,7 @@ const checkClearScheme = (event) => {
             title="Очистить историю"
             @click="clearColorHistory"
         />
-        <context-menu v-if="colorHistory.length > 1" ref="menu" :model="items" />
+        <context-menu ref="menu" :model="filteredContextMenuItems" />
       </div>
     </div>
 
