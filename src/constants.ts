@@ -1,4 +1,5 @@
 export const INITIAL_CELL_FILL = '#add8e6'
+export const INITIAL_CELL_COLOR = '6466f1'
 export const INITIAL_STROKE_COLOR = 'black'
 export const INITIAL_SCHEME_WIDTH = 20
 export const INITIAL_SCHEME_HEIGHT = 10

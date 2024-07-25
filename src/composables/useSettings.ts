@@ -13,6 +13,7 @@ import {
   INITIAL_STAGE_SCALE,
   STROKE_WIDTH,
   CORNER_RADIUS,
+  INITIAL_CELL_COLOR,
 } from '../constants'
 
 export function useSettings() {
@@ -29,7 +30,7 @@ export function useSettings() {
   const isSaveToFavoriteButtonVisible = useStorage('is-save-to-favorite-button-visible', false)
   const schemeWidth = useStorage('scheme-width', INITIAL_SCHEME_WIDTH)
   const schemeHeight = useStorage('scheme-height', INITIAL_SCHEME_HEIGHT)
-  const cellColor = useStorage('cell-color', '6466f1')
+  const cellColor = useStorage('cell-color', INITIAL_CELL_COLOR)
   const colorHistory = useStorage('color-history', [cellColor.value])
   const cellWidth = useStorage('color-width', INITIAL_CELL_WIDTH)
   const scheme = useStorage('scheme', new Map())
@@ -207,6 +208,8 @@ export function useSettings() {
     useStorage(name, {
       scheme: [...scheme.value],
       hasCellOffset: hasCellOffset.value,
+      cellFill: cellFill.value,
+      strokeColor: strokeColor.value,
       cellWidth: cellWidth.value,
       schemeWidth: schemeWidth.value,
       schemeHeight: schemeHeight.value,
@@ -220,6 +223,8 @@ export function useSettings() {
 
     scheme.value = new Map(schemeData.value.scheme)
     hasCellOffset.value = schemeData.value.hasCellOffset
+    cellFill.value = schemeData.value.cellFill
+    strokeColor.value = schemeData.value.strokeColor
     cellWidth.value = schemeData.value.cellWidth
     schemeWidth.value = schemeData.value.schemeWidth
     schemeHeight.value = schemeData.value.schemeHeight
