@@ -30,6 +30,7 @@ const {
   clearScheme,
   clearSchemePosition,
   exportImage,
+  setAsBackground,
 } = useSettings()
 
 const menu = ref(null)
@@ -38,6 +39,10 @@ const items = ref([
   {
     label: 'Удалить этот цвет',
     command: () => removeColorFromHistory(selectedColor.value),
+  },
+  {
+    label: 'Использовать как фон',
+    command: () => setAsBackground(selectedColor.value),
   },
 ])
 
@@ -50,7 +55,7 @@ function onColorRightClick(event, color) {
 const checkClearScheme = (event) => {
   confirm.require({
     target: event.currentTarget,
-    message: 'Вы точно хотите очистить всю схему',
+    message: 'Вы точно хотите очистить всю схему?',
     icon: 'pi pi-info-circle',
     rejectClass: 'p-button-secondary p-button-outlined p-button-sm',
     acceptClass: 'p-button-danger p-button-sm',

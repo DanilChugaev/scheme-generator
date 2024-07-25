@@ -1,33 +1,46 @@
 import { computed, inject, watch, ref, watchEffect } from 'vue'
 import { useStorage, useDateFormat, useNow, useDebounceFn } from '@vueuse/core'
 import { useWorkspace } from './useWorkspace'
+import {
+  INITIAL_CELL_FILL,
+  INITIAL_STROKE_COLOR,
+  INITIAL_SCHEME_WIDTH,
+  INITIAL_SCHEME_HEIGHT,
+  TEXT_COLOR_FOR_DARK_THEME,
+  TEXT_COLOR_FOR_LIGHT_THEME,
+  INITIAL_CELL_WIDTH,
+  INITIAL_GROUP_POSITION,
+  INITIAL_STAGE_SCALE,
+  STROKE_WIDTH,
+  CORNER_RADIUS,
+} from '../constants'
 
 export function useSettings() {
   const toggleDarkMode = inject('toggleDarkMode')
   const { stage } = useWorkspace()
 
   const groupConfig = useStorage('group-config', {
-    x: 20,
-    y: 20,
+    x: INITIAL_GROUP_POSITION,
+    y: INITIAL_GROUP_POSITION,
     draggable: true,
   })
   const hasCellOffset = useStorage('has-cell-offset', false)
-  const schemeWidth = useStorage('scheme-width', 20)
-  const schemeHeight = useStorage('scheme-height', 10)
+  const schemeWidth = useStorage('scheme-width', INITIAL_SCHEME_WIDTH)
+  const schemeHeight = useStorage('scheme-height', INITIAL_SCHEME_HEIGHT)
   const cellColor = useStorage('cell-color', '6466f1')
   const colorHistory = useStorage('color-history', [cellColor.value])
-  const cellWidth = useStorage('color-width', 50)
+  const cellWidth = useStorage('color-width', INITIAL_CELL_WIDTH)
   const scheme = useStorage('scheme', new Map())
+  const cellFill = useStorage('cell-fill', INITIAL_CELL_FILL)
+  const strokeColor = useStorage('stroke-color', INITIAL_STROKE_COLOR)
 
   const isDark = ref(toggleDarkMode())
-  const cellHeight = ref(50)
-  const initialCellFill = ref('#add8e6')
-  const strokeColor = ref('black')
-  const strokeWidth = ref(1)
-  const cornerRadius = ref(5)
+  const cellHeight = ref(INITIAL_CELL_WIDTH)
+  const strokeWidth = ref(STROKE_WIDTH)
+  const cornerRadius = ref(CORNER_RADIUS)
 
   const cellOffset = computed(() => hasCellOffset.value ? cellWidth.value / 2 : 0)
-  const textColor = computed(() => isDark.value ? '#adbac7' : '#1F2328')
+  const textColor = computed(() => isDark.value ? TEXT_COLOR_FOR_DARK_THEME : TEXT_COLOR_FOR_LIGHT_THEME)
 
   watch(cellColor, useDebounceFn(_updateColorHistory, 300))
 
@@ -71,6 +84,8 @@ export function useSettings() {
               x: cellWidth.value * w + resultOffset,
               y: h + cellHeight.value * h,
               width: cellWidth.value,
+              fill: scheme.value.get(id).isFilled ? scheme.value.get(id).fill : cellFill.value,
+              stroke: scheme.value.get(id).isFilled ? scheme.value.get(id).stroke : strokeColor.value,
             })
           } else {
             result.set(id, {
@@ -80,10 +95,11 @@ export function useSettings() {
               y: h + cellHeight.value * h,
               width: cellWidth.value,
               height: cellHeight.value,
-              fill: initialCellFill.value,
+              fill: cellFill.value,
               stroke: strokeColor.value,
               strokeWidth: strokeWidth.value,
               cornerRadius: cornerRadius.value,
+              isFilled: false,
             })
           }
         }
@@ -119,7 +135,8 @@ export function useSettings() {
 
     const newColor = `#${cellColor.value}`
 
-    cell.fill = cell.fill === newColor ? initialCellFill.value : newColor
+    cell.fill = cell.fill === newColor ? cellFill.value : newColor
+    cell.isFilled = true
   }
 
   function downloadURI(uri, name) {
@@ -145,20 +162,31 @@ export function useSettings() {
 
   function clearScheme() {
     scheme.value.clear()
-    schemeWidth.value = 20
-    schemeHeight.value = 10
+    schemeWidth.value = INITIAL_SCHEME_WIDTH
+    schemeHeight.value = INITIAL_SCHEME_HEIGHT
+    cellFill.value = INITIAL_CELL_FILL
+    strokeColor.value = INITIAL_STROKE_COLOR
   }
 
   function clearSchemePosition() {
-    const position = 20
+    const position = INITIAL_GROUP_POSITION
 
-    stage.value.scale({ x: 1, y: 1 })
+    stage.value.scale({
+      x: INITIAL_STAGE_SCALE,
+      y: INITIAL_STAGE_SCALE,
+    })
     stage.value.position({
       x: position,
       y: position,
     })
     groupConfig.value.x = position
     groupConfig.value.y = position
+  }
+
+  function setAsBackground(color: string) {
+    cellFill.value = `#${color}`
+    // инвертируем границы ячеек
+    strokeColor.value = (parseInt(color, 16) ^ 0xFFFFFF | 0x1000000).toString(16).substring(1)
   }
 
   return {
@@ -180,5 +208,6 @@ export function useSettings() {
     saveSchemePosition,
     clearScheme,
     clearSchemePosition,
+    setAsBackground,
   }
 }
