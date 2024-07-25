@@ -85,7 +85,7 @@ export function useSettings() {
               y: h + cellHeight.value * h,
               width: cellWidth.value,
               fill: scheme.value.get(id).isFilled ? scheme.value.get(id).fill : cellFill.value,
-              stroke: scheme.value.get(id).isFilled ? scheme.value.get(id).stroke : strokeColor.value,
+              stroke: strokeColor.value,
             })
           } else {
             result.set(id, {
