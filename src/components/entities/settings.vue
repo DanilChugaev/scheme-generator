@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
+import { useDateFormat, useNow } from '@vueuse/core'
 
 import Checkbox from 'primevue/checkbox'
 import ToggleSwitch from 'primevue/toggleswitch'
@@ -48,6 +49,7 @@ const selectedColor = ref('')
 const schemeName = ref('')
 const isVisibleModalForSaveToFavorite = ref(false)
 const isVisibleModalForShare = ref(false)
+const isVisibleModalForExport = ref(false)
 const fileupload = ref()
 
 const filteredContextMenuItems = computed(() => [
@@ -98,7 +100,7 @@ function checkSaveSchemeIfExist(event) {
 async function checkParseBeforeUploadScheme(event) {
   return new Promise(resolve => {
     confirm.require({
-      target: event.currentTarget,
+      target: event.originalEvent.currentTarget,
       message: 'Прежде чем загрузить новую схему, хотите ли сохранить текущую?',
       icon: 'pi pi-info-circle',
       rejectClass: 'p-button-secondary p-button-outlined p-button-sm',
@@ -106,6 +108,8 @@ async function checkParseBeforeUploadScheme(event) {
       rejectLabel: 'Нет',
       acceptLabel: 'Да',
       accept: () => {
+        const formattedTime = useDateFormat(useNow(), 'DD-MM-YYYY HH-mm-ss')
+        schemeName.value = formattedTime.value
         handlerAfterAcceptSaveSchemeToFavorite()
         resolve()
       },
@@ -155,6 +159,17 @@ async function parse(event) {
     warnNotify(error)
   }
 }
+
+async function exportImageToComputer() {
+  try {
+    exportImage(schemeName.value)
+
+    isVisibleModalForExport.value = false
+    schemeName.value = ''
+  } catch (error) {
+    warnNotify(error)
+  }
+}
 </script>
 
 <template>
@@ -167,6 +182,11 @@ async function parse(event) {
     v-model="schemeName"
     v-model:is-visible="isVisibleModalForShare"
     @save="share"
+  />
+  <enter-scheme-name
+    v-model="schemeName"
+    v-model:is-visible="isVisibleModalForExport"
+    @save="exportImageToComputer"
   />
 
   <div class="h-full w-full max-w-[400px] border-l border-sky-500 flex flex-col gap-4 p-6">
@@ -253,7 +273,7 @@ async function parse(event) {
     <prime-button
         raised
         label="Скачать картинкой"
-        @click="exportImage"
+        @click="isVisibleModalForExport = true"
     />
 
     <prime-button

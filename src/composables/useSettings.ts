@@ -151,11 +151,10 @@ export function useSettings() {
     _clearSelectedSchemeName()
   }
 
-  function exportImage() {
+  function exportImage(schemeName) {
     const dataURL = stage.value.toDataURL({ pixelRatio: 3 })
-    const formattedTime = useDateFormat(useNow(), 'DD-MM-YYYY HH-mm-ss')
 
-    downloadURI(dataURL, `${formattedTime.value}.png`)
+    downloadURI(dataURL, `${schemeName}.png`)
   }
 
   function saveSchemePosition({ x, y }) {
