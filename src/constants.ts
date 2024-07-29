@@ -10,3 +10,4 @@ export const STROKE_WIDTH = 1
 export const CORNER_RADIUS = 5
 export const TEXT_COLOR_FOR_DARK_THEME = '#adbac7'
 export const TEXT_COLOR_FOR_LIGHT_THEME = '#1F2328'
+export const NOTIFICATION_LIFETIME = 5000

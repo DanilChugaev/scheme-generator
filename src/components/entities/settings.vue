@@ -9,16 +9,14 @@ import PrimeButton from 'primevue/button'
 import InputIcon from 'primevue/inputicon'
 import ContextMenu from 'primevue/contextmenu'
 import Slider from 'primevue/slider'
-import ConfirmPopup from 'primevue/confirmpopup'
-import PrimeDialog from 'primevue/dialog'
-import PrimeToast from 'primevue/toast'
-import PrimeDropdown from 'primevue/dropdown'
+import PrimeSelect from 'primevue/select'
+import FileUpload from 'primevue/fileupload'
 
-import { useToast } from 'primevue/usetoast'
 import { useConfirm } from 'primevue/useconfirm'
 import { useSettings } from '../../composables/useSettings'
+import { useNotifications } from '../../composables/useNotifications'
+import EnterSchemeName from '../modals/enter-scheme-name.vue'
 
-const toast = useToast()
 const confirm = useConfirm()
 
 const {
@@ -30,23 +28,27 @@ const {
   cellWidth,
   colorHistory,
   toggleDarkMode,
-  isSaveToFavoriteButtonVisible,
   favorites,
   selectedScheme,
   saveSchemeToFavoriteStorage,
-  restoreSchemeFromStorage,
+  restoreSchemeFromFavoriteStorage,
   removeColorFromHistory,
   clearColorHistory,
   clearScheme,
   clearSchemePosition,
   exportImage,
-  setAsBackground,
+  setColorAsBackground,
+  shareScheme,
+  parseScheme,
 } = useSettings()
+const { successNotify, warnNotify } = useNotifications()
 
 const menu = ref(null)
 const selectedColor = ref('')
 const schemeName = ref('')
 const isVisibleModalForSaveToFavorite = ref(false)
+const isVisibleModalForShare = ref(false)
+const fileupload = ref()
 
 const filteredContextMenuItems = computed(() => [
   {
@@ -56,7 +58,7 @@ const filteredContextMenuItems = computed(() => [
   },
   {
     label: 'Использовать как фон',
-    command: () => setAsBackground(selectedColor.value),
+    command: () => setColorAsBackground(selectedColor.value),
     isVisible: true,
   },
 ].filter(item => item.isVisible))
@@ -67,7 +69,7 @@ function onColorRightClick(event, color) {
   menu.value?.show(event)
 }
 
-const checkClearScheme = (event) => {
+function checkClearScheme(event) {
   confirm.require({
     target: event.currentTarget,
     message: 'Вы точно хотите очистить всю схему?',
@@ -80,16 +82,7 @@ const checkClearScheme = (event) => {
   })
 }
 
-const showSuccessSave = () => {
-  toast.add({
-    severity: 'success',
-    summary: 'Схема добавлена в избранное',
-    detail: `Имя схемы: ${schemeName.value}`,
-    life: 3000,
-  })
-}
-
-const checkSaveSchemeIfExist = (event) => {
+function checkSaveSchemeIfExist(event) {
   confirm.require({
     target: event.currentTarget,
     message: 'Схема с таким названием существует, хотите перезаписать?',
@@ -98,9 +91,26 @@ const checkSaveSchemeIfExist = (event) => {
     acceptClass: 'p-button-danger p-button-sm',
     rejectLabel: 'Нет',
     acceptLabel: 'Да',
-    accept: () => {
-      handlerAfterAcceptSaveSchemeToFavorite()
-    },
+    accept: () => handlerAfterAcceptSaveSchemeToFavorite('Схема перезаписана'),
+  })
+}
+
+async function checkParseBeforeUploadScheme(event) {
+  return new Promise(resolve => {
+    confirm.require({
+      target: event.currentTarget,
+      message: 'Прежде чем загрузить новую схему, хотите ли сохранить текущую?',
+      icon: 'pi pi-info-circle',
+      rejectClass: 'p-button-secondary p-button-outlined p-button-sm',
+      acceptClass: 'p-button-danger p-button-sm',
+      rejectLabel: 'Нет',
+      acceptLabel: 'Да',
+      accept: () => {
+        handlerAfterAcceptSaveSchemeToFavorite()
+        resolve()
+      },
+      reject: () => resolve(),
+    })
   })
 }
 
@@ -114,27 +124,48 @@ function saveSchemeToFavorite(event) {
   }
 }
 
-function handlerAfterAcceptSaveSchemeToFavorite() {
+function handlerAfterAcceptSaveSchemeToFavorite(message: string) {
   saveSchemeToFavoriteStorage(schemeName.value)
-  showSuccessSave()
+  successNotify(message || 'Схема добавлена в избранное', `Имя схемы: ${schemeName.value}`)
 
   isVisibleModalForSaveToFavorite.value = false
   schemeName.value = ''
 }
+
+async function share() {
+  try {
+    await shareScheme(schemeName.value)
+
+    isVisibleModalForShare.value = false
+    schemeName.value = ''
+  } catch (error) {
+    warnNotify(error)
+  }
+}
+
+async function parse(event) {
+  try {
+    await checkParseBeforeUploadScheme(event)
+    await parseScheme(fileupload.value)
+
+    successNotify('Схема успешно загружена')
+  } catch (error) {
+    warnNotify(error)
+  }
+}
 </script>
 
 <template>
-  <prime-toast position="bottom-center" />
-  <confirm-popup />
-
-  <prime-dialog v-model:visible="isVisibleModalForSaveToFavorite" modal header="Введите имя схемы" :style="{ width: '25rem' }">
-    <input-text v-model="schemeName" class="w-full" autocomplete="off" @keydown.enter="saveSchemeToFavorite" />
-
-    <div class="flex justify-end gap-2 mt-3">
-      <prime-button type="button" label="Отмена" severity="secondary" @click="isVisibleModalForSaveToFavorite = false" />
-      <prime-button type="button" label="Сохранить" @click="saveSchemeToFavorite" />
-    </div>
-  </prime-dialog>
+  <enter-scheme-name
+    v-model="schemeName"
+    v-model:is-visible="isVisibleModalForSaveToFavorite"
+    @save="saveSchemeToFavorite"
+  />
+  <enter-scheme-name
+    v-model="schemeName"
+    v-model:is-visible="isVisibleModalForShare"
+    @save="share"
+  />
 
   <div class="h-full w-full max-w-[400px] border-l border-sky-500 flex flex-col gap-4 p-6">
     <h2><b>Настройки</b></h2>
@@ -148,12 +179,12 @@ function handlerAfterAcceptSaveSchemeToFavorite() {
     <div v-if="favorites.length" class="item item--vertical">
       <h3>Избранное</h3>
 
-      <prime-dropdown
+      <prime-select
           v-model="selectedScheme"
           :options="favorites"
           placeholder="Выберите схему"
           class="w-full md:w-14rem"
-          @update:model-value="restoreSchemeFromStorage($event)"
+          @update:model-value="restoreSchemeFromFavoriteStorage($event)"
       />
     </div>
 
@@ -224,11 +255,18 @@ function handlerAfterAcceptSaveSchemeToFavorite() {
     />
 
     <prime-button
-        v-if="isSaveToFavoriteButtonVisible"
         label="Сохранить в избранное"
         severity="secondary"
         @click="isVisibleModalForSaveToFavorite = true"
     />
+
+    <prime-button
+        label="Поделиться схемой"
+        severity="secondary"
+        @click="isVisibleModalForShare = true"
+    />
+
+    <FileUpload ref="fileupload" mode="basic" @select="parse"/>
 
     <div class="flex flex-col gap-4 mt-auto">
       <prime-button

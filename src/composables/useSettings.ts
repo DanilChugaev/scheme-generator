@@ -15,10 +15,13 @@ import {
   CORNER_RADIUS,
   INITIAL_CELL_COLOR,
 } from '../constants'
+import { ISavedParams } from '../types'
+import { useFileLoader } from './useFileLoader'
 
 export function useSettings() {
   const toggleDarkMode = inject('toggleDarkMode')
   const { stage } = useWorkspace()
+  const { downloadJSON, downloadURI, readFile } = useFileLoader()
 
   const groupConfig = useStorage('group-config', {
     x: INITIAL_GROUP_POSITION,
@@ -26,8 +29,6 @@ export function useSettings() {
     draggable: true,
   })
   const hasCellOffset = useStorage('has-cell-offset', false)
-  // TODO: после восстановления схемы из урла делать кнопку активной
-  const isSaveToFavoriteButtonVisible = useStorage('is-save-to-favorite-button-visible', false)
   const schemeWidth = useStorage('scheme-width', INITIAL_SCHEME_WIDTH)
   const schemeHeight = useStorage('scheme-height', INITIAL_SCHEME_HEIGHT)
   const cellColor = useStorage('cell-color', INITIAL_CELL_COLOR)
@@ -49,7 +50,7 @@ export function useSettings() {
 
   watch(cellColor, useDebounceFn(_updateColorHistory, 300))
 
-  watchEffect(() => {
+  watchEffect(async () => {
     const result = new Map()
 
     for (let h = 0; h <= schemeHeight.value; h++) {
@@ -129,10 +130,10 @@ export function useSettings() {
   function clearColorHistory() {
     colorHistory.value = []
     colorHistory.value.push(cellColor.value)
-    clearSelectedSchemeName()
+    _clearSelectedSchemeName()
   }
 
-  function clearSelectedSchemeName() {
+  function _clearSelectedSchemeName() {
     selectedScheme.value = ''
   }
 
@@ -147,17 +148,7 @@ export function useSettings() {
 
     cell.fill = cell.fill === newColor ? cellFill.value : newColor
     cell.isFilled = true
-    isSaveToFavoriteButtonVisible.value = true
-    clearSelectedSchemeName()
-  }
-
-  function downloadURI(uri, name) {
-    const link = document.createElement('a')
-    link.download = name
-    link.href = uri
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
+    _clearSelectedSchemeName()
   }
 
   function exportImage() {
@@ -178,8 +169,7 @@ export function useSettings() {
     schemeHeight.value = INITIAL_SCHEME_HEIGHT
     cellFill.value = INITIAL_CELL_FILL
     strokeColor.value = INITIAL_STROKE_COLOR
-    isSaveToFavoriteButtonVisible.value = false
-    clearSelectedSchemeName()
+    _clearSelectedSchemeName()
   }
 
   function clearSchemePosition() {
@@ -197,7 +187,7 @@ export function useSettings() {
     groupConfig.value.y = position
   }
 
-  function setAsBackground(color: string) {
+  function setColorAsBackground(color: string) {
     cellFill.value = `#${color}`
     // инвертируем границы ячеек
     strokeColor.value = `#${(parseInt(color, 16) ^ 0xFFFFFF | 0x1000000).toString(16).substring(1)}`
@@ -205,7 +195,7 @@ export function useSettings() {
 
   function saveSchemeToFavoriteStorage(name: string) {
     favorites.value = [...new Set([...favorites.value, name])]
-    useStorage(name, {
+    useStorage<ISavedParams>(name, {
       scheme: [...scheme.value],
       hasCellOffset: hasCellOffset.value,
       cellFill: cellFill.value,
@@ -218,18 +208,48 @@ export function useSettings() {
     })
   }
 
-  function restoreSchemeFromStorage(name) {
-    const schemeData = useStorage(name, {})
+  async function restoreSchemeFromFavoriteStorage(name: string) {
+    const schemeData = useStorage<ISavedParams>(name, {})
 
-    scheme.value = new Map(schemeData.value.scheme)
+    schemeHeight.value = schemeData.value.schemeHeight
+    schemeWidth.value = schemeData.value.schemeWidth
     hasCellOffset.value = schemeData.value.hasCellOffset
     cellFill.value = schemeData.value.cellFill
     strokeColor.value = schemeData.value.strokeColor
     cellWidth.value = schemeData.value.cellWidth
-    schemeWidth.value = schemeData.value.schemeWidth
-    schemeHeight.value = schemeData.value.schemeHeight
     cellColor.value = schemeData.value.cellColor
     colorHistory.value = schemeData.value.colorHistory
+
+    scheme.value = new Map(schemeData.value.scheme)
+  }
+
+  function shareScheme(schemeName) {
+    downloadJSON({
+      scheme: [...scheme.value],
+      hasCellOffset: hasCellOffset.value,
+      cellFill: cellFill.value,
+      strokeColor: strokeColor.value,
+      cellWidth: cellWidth.value,
+      schemeWidth: schemeWidth.value,
+      schemeHeight: schemeHeight.value,
+      cellColor: cellColor.value,
+      colorHistory: [...colorHistory.value],
+    }, schemeName)
+  }
+
+  async function parseScheme(fileupload) {
+    const params: ISavedParams = await readFile(fileupload)
+
+    schemeHeight.value = params.schemeHeight
+    schemeWidth.value = params.schemeWidth
+    hasCellOffset.value = params.hasCellOffset
+    cellFill.value = params.cellFill
+    strokeColor.value = params.strokeColor
+    cellWidth.value = params.cellWidth
+    cellColor.value = params.cellColor
+    colorHistory.value = params.colorHistory
+
+    scheme.value = new Map(params.scheme)
   }
 
   return {
@@ -244,11 +264,10 @@ export function useSettings() {
     cellColor,
     colorHistory,
     toggleDarkMode,
-    isSaveToFavoriteButtonVisible,
     favorites,
     selectedScheme,
     saveSchemeToFavoriteStorage,
-    restoreSchemeFromStorage,
+    restoreSchemeFromFavoriteStorage,
     paintCell,
     clearColorHistory,
     exportImage,
@@ -256,6 +275,8 @@ export function useSettings() {
     saveSchemePosition,
     clearScheme,
     clearSchemePosition,
-    setAsBackground,
+    setColorAsBackground,
+    shareScheme,
+    parseScheme,
   }
 }
