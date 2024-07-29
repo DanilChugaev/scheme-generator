@@ -38,6 +38,7 @@ defineEmits(['save'])
         v-model="model"
         class="w-full"
         autocomplete="off"
+        autofocus
         @keydown.enter="$emit('save', $event)"
     />
 

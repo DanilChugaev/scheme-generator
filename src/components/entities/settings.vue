@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useDateFormat, useNow } from '@vueuse/core'
 
 import Checkbox from 'primevue/checkbox'
@@ -41,6 +41,8 @@ const {
   setColorAsBackground,
   shareScheme,
   parseScheme,
+  clearSelectedSchemeName,
+  updateScheme,
 } = useSettings()
 const { successNotify, warnNotify } = useNotifications()
 
@@ -134,6 +136,7 @@ function handlerAfterAcceptSaveSchemeToFavorite(message: string) {
 
   isVisibleModalForSaveToFavorite.value = false
   schemeName.value = ''
+  clearSelectedSchemeName()
 }
 
 async function share() {
@@ -170,6 +173,13 @@ async function exportImageToComputer() {
     warnNotify(error)
   }
 }
+
+function toggleTheme(event) {
+  toggleDarkMode(event)
+  updateScheme()
+}
+
+onMounted(updateScheme)
 </script>
 
 <template>
@@ -195,7 +205,7 @@ async function exportImageToComputer() {
     <div class="item">
       <h3>Темная тема</h3>
 
-      <toggle-switch v-model="isDark" @change="toggleDarkMode" />
+      <toggle-switch v-model="isDark" @change="toggleTheme" />
     </div>
 
     <div v-if="favorites.length" class="item item--vertical">
@@ -213,25 +223,25 @@ async function exportImageToComputer() {
     <div class="item">
       <h3>Со смещением</h3>
 
-      <checkbox v-model="hasCellOffset" :binary="true" />
+      <checkbox v-model="hasCellOffset" :binary="true" @update:model-value="updateScheme" />
     </div>
 
     <div class="item">
       <h3>Внешний вид ({{ cellWidth }})</h3>
 
-      <slider class="w-[10rem]" v-model="cellWidth" :step="5" :min="50" :max="100" />
+      <slider class="w-[10rem]" v-model="cellWidth" :step="5" :min="50" :max="100" @update:model-value="updateScheme" />
     </div>
 
     <div class="item">
       <h3>Ширина схемы</h3>
 
-      <input-text class="max-w-[100px]" type="number" v-model="schemeWidth" />
+      <input-text class="max-w-[100px]" type="number" v-model="schemeWidth" @update:model-value="updateScheme" />
     </div>
 
     <div class="item">
       <h3>Высота схемы</h3>
 
-      <input-text class="max-w-[100px]" type="number" v-model="schemeHeight" />
+      <input-text class="max-w-[100px]" type="number" v-model="schemeHeight" @update:model-value="updateScheme" />
     </div>
 
     <div class="item">

@@ -50,7 +50,7 @@ export function useSettings() {
 
   watch(cellColor, useDebounceFn(_updateColorHistory, 300))
 
-  watchEffect(() => {
+  function updateScheme() {
     const result = new Map()
 
     for (let h = 0; h <= schemeHeight.value; h++) {
@@ -113,7 +113,7 @@ export function useSettings() {
     }
 
     scheme.value = result
-  })
+  }
 
   function _updateColorHistory(color: string) {
     colorHistory.value = [...new Set([...colorHistory.value, color])]
@@ -130,10 +130,10 @@ export function useSettings() {
   function clearColorHistory() {
     colorHistory.value = []
     colorHistory.value.push(cellColor.value)
-    _clearSelectedSchemeName()
+    clearSelectedSchemeName()
   }
 
-  function _clearSelectedSchemeName() {
+  function clearSelectedSchemeName() {
     selectedScheme.value = ''
   }
 
@@ -148,7 +148,7 @@ export function useSettings() {
 
     cell.fill = cell.fill === newColor ? cellFill.value : newColor
     cell.isFilled = true
-    _clearSelectedSchemeName()
+    clearSelectedSchemeName()
   }
 
   function exportImage(schemeName) {
@@ -168,7 +168,9 @@ export function useSettings() {
     schemeHeight.value = INITIAL_SCHEME_HEIGHT
     cellFill.value = INITIAL_CELL_FILL
     strokeColor.value = INITIAL_STROKE_COLOR
-    _clearSelectedSchemeName()
+    clearSelectedSchemeName()
+
+    updateScheme()
   }
 
   function clearSchemePosition() {
@@ -190,11 +192,20 @@ export function useSettings() {
     cellFill.value = `#${color}`
     // инвертируем границы ячеек
     strokeColor.value = `#${(parseInt(color, 16) ^ 0xFFFFFF | 0x1000000).toString(16).substring(1)}`
+
+    updateScheme()
   }
 
   function saveSchemeToFavoriteStorage(name: string) {
+    const schemeData = useStorage<ISavedParams>(name, {})
+
     favorites.value = [...new Set([...favorites.value, name])]
-    useStorage<ISavedParams>(name, {
+
+    if (schemeData.value) {
+      schemeData.value = {}
+    }
+
+    schemeData.value = {
       scheme: [...scheme.value],
       hasCellOffset: hasCellOffset.value,
       cellFill: cellFill.value,
@@ -204,7 +215,7 @@ export function useSettings() {
       schemeHeight: schemeHeight.value,
       cellColor: cellColor.value,
       colorHistory: colorHistory.value,
-    })
+    }
   }
 
   async function restoreSchemeFromFavoriteStorage(name: string) {
@@ -218,8 +229,9 @@ export function useSettings() {
     cellWidth.value = schemeData.value.cellWidth
     cellColor.value = schemeData.value.cellColor
     colorHistory.value = schemeData.value.colorHistory
-
     scheme.value = new Map(schemeData.value.scheme)
+
+    updateScheme()
   }
 
   function shareScheme(schemeName) {
@@ -247,8 +259,9 @@ export function useSettings() {
     cellWidth.value = params.cellWidth
     cellColor.value = params.cellColor
     colorHistory.value = params.colorHistory
-
     scheme.value = new Map(params.scheme)
+
+    updateScheme()
   }
 
   return {
@@ -277,5 +290,8 @@ export function useSettings() {
     setColorAsBackground,
     shareScheme,
     parseScheme,
+    clearSelectedSchemeName,
+
+    updateScheme,
   }
 }
