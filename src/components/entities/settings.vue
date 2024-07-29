@@ -261,7 +261,12 @@ onMounted(updateScheme)
         <span
             v-for="color in colorHistory"
             :key="color"
-            class="p-colorpicker-preview"
+            :class="[
+                'p-colorpicker-preview',
+                {
+                  'p-colorpicker-preview--active': color === cellColor
+                }
+            ]"
             :data-color="color"
             :style="[
                 `background-color: #${color}`
@@ -338,5 +343,10 @@ onMounted(updateScheme)
     width: 24px;
     cursor: pointer;
   }
+}
+
+.p-colorpicker-preview--active {
+  outline: 1px solid var(--color-text);
+  outline-offset: 1px;
 }
 </style>
