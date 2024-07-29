@@ -50,7 +50,7 @@ export function useSettings() {
 
   watch(cellColor, useDebounceFn(_updateColorHistory, 300))
 
-  watchEffect(async () => {
+  watchEffect(() => {
     const result = new Map()
 
     for (let h = 0; h <= schemeHeight.value; h++) {

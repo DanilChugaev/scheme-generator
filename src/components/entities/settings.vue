@@ -148,6 +148,8 @@ async function parse(event) {
     await checkParseBeforeUploadScheme(event)
     await parseScheme(fileupload.value)
 
+    fileupload.value.files = []
+
     successNotify('Схема успешно загружена')
   } catch (error) {
     warnNotify(error)
@@ -266,7 +268,7 @@ async function parse(event) {
         @click="isVisibleModalForShare = true"
     />
 
-    <FileUpload ref="fileupload" mode="basic" @select="parse"/>
+    <file-upload ref="fileupload" mode="basic" @select="parse" accept="application/json" chooseLabel="Загрузить схему"/>
 
     <div class="flex flex-col gap-4 mt-auto">
       <prime-button
