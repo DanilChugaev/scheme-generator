@@ -9,6 +9,8 @@ import VueKonva from 'vue-konva'
 import 'primeicons/primeicons.css'
 import ConfirmationService from 'primevue/confirmationservice'
 import ToastService from 'primevue/toastservice'
+import Vue3ColorPicker from "vue3-colorpicker";
+import "vue3-colorpicker/style.css";
 
 const app = createApp(App);
 
@@ -36,6 +38,7 @@ const MyPreset = definePreset(Aura, {
 });
 
 app
+  .use(Vue3ColorPicker)
   .use(ToastService)
   .use(ConfirmationService)
   .use(VueKonva)

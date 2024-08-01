@@ -5,7 +5,6 @@ import { useDateFormat, useNow } from '@vueuse/core'
 import Checkbox from 'primevue/checkbox'
 import ToggleSwitch from 'primevue/toggleswitch'
 import InputText from 'primevue/inputtext'
-import ColorPicker from 'primevue/colorpicker'
 import PrimeButton from 'primevue/button'
 import InputIcon from 'primevue/inputicon'
 import ContextMenu from 'primevue/contextmenu'
@@ -43,6 +42,8 @@ const {
   parseScheme,
   clearSelectedSchemeName,
   updateScheme,
+  setCellColor,
+  getCorrectColor,
 } = useSettings()
 const { successNotify, warnNotify } = useNotifications()
 
@@ -130,7 +131,7 @@ function saveSchemeToFavorite(event) {
   }
 }
 
-function handlerAfterAcceptSaveSchemeToFavorite(message: string) {
+function handlerAfterAcceptSaveSchemeToFavorite(message?: string) {
   saveSchemeToFavoriteStorage(schemeName.value)
   successNotify(message || 'Схема добавлена в избранное', `Имя схемы: ${schemeName.value}`)
 
@@ -179,7 +180,10 @@ function toggleTheme(event) {
   updateScheme()
 }
 
-onMounted(updateScheme)
+onMounted(() => {
+  colorHistory.value = colorHistory.value.map(color => getCorrectColor(color))
+  updateScheme()
+})
 </script>
 
 <template>
@@ -248,9 +252,10 @@ onMounted(updateScheme)
       <h3>Выбрать цвет</h3>
 
       <color-picker
-          v-model="cellColor"
-          inputId="cp-hex"
+          v-model:pureColor="cellColor"
           format="hex"
+          shape="circle"
+          disable-history
       />
     </div>
 
@@ -262,18 +267,18 @@ onMounted(updateScheme)
             v-for="color in colorHistory"
             :key="color"
             :class="[
-                'p-colorpicker-preview',
+                'colorpicker-preview',
                 {
-                  'p-colorpicker-preview--active': color === cellColor
+                  'colorpicker-preview--active': color === cellColor
                 }
             ]"
             :data-color="color"
             :style="[
-                `background-color: #${color}`
+                `background-color: ${color}`
             ]"
             @contextmenu="onColorRightClick($event, color)"
             aria-haspopup="true"
-            @click="cellColor = color"
+            @click="setCellColor(color)"
         ></span>
         <input-icon
             v-if="colorHistory.length > 1"
@@ -345,8 +350,22 @@ onMounted(updateScheme)
   }
 }
 
-.p-colorpicker-preview--active {
-  outline: 1px solid var(--color-text);
-  outline-offset: 1px;
+.colorpicker-preview {
+  cursor: pointer;
+  width: 20px;
+  height: 20px;
+  border: 1px solid var(--color-border) !important;
+  border-radius: 50%;
+
+  &--active {
+    outline: 1px solid var(--color-text);
+    outline-offset: 1px;
+  }
+}
+</style>
+
+<style>
+.vc-color-wrap.round {
+  border: 1px solid var(--color-border) !important;
 }
 </style>

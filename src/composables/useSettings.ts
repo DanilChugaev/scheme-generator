@@ -116,7 +116,7 @@ export function useSettings() {
   }
 
   function _updateColorHistory(color: string) {
-    colorHistory.value = [...new Set([...colorHistory.value, color])]
+    colorHistory.value = [...new Set([...colorHistory.value, getCorrectColor(color)])]
   }
 
   function removeColorFromHistory(color: string) {
@@ -144,7 +144,7 @@ export function useSettings() {
       return
     }
 
-    const newColor = `#${cellColor.value}`
+    const newColor = getCorrectColor(cellColor.value)
 
     cell.fill = cell.fill === newColor ? cellFill.value : newColor
     cell.isFilled = true
@@ -189,9 +189,9 @@ export function useSettings() {
   }
 
   function setColorAsBackground(color: string) {
-    cellFill.value = `#${color}`
+    cellFill.value = getCorrectColor(color)
     // инвертируем границы ячеек
-    strokeColor.value = `#${(parseInt(color, 16) ^ 0xFFFFFF | 0x1000000).toString(16).substring(1)}`
+    strokeColor.value = `#${(parseInt(color.substring(1), 16) ^ 0xFFFFFF | 0x1000000).toString(16).substring(1)}`
 
     updateScheme()
   }
@@ -264,6 +264,15 @@ export function useSettings() {
     updateScheme()
   }
 
+  // для обратной совместимости (удалить через какое то время)
+  function getCorrectColor(color: string) {
+    return color.includes('#') ? color : `#${color}`
+  }
+
+  function setCellColor(color: string) {
+    cellColor.value = getCorrectColor(color)
+  }
+
   return {
     scheme,
     isDark,
@@ -291,6 +300,8 @@ export function useSettings() {
     shareScheme,
     parseScheme,
     clearSelectedSchemeName,
+    setCellColor,
+    getCorrectColor,
 
     updateScheme,
   }
