@@ -306,16 +306,16 @@ onMounted(() => {
             :class="[
                 'colorpicker-preview',
                 {
-                  'colorpicker-preview--active': color === cellColor
+                  'colorpicker-preview--active': getCorrectColor(color) === getCorrectColor(cellColor)
                 }
             ]"
             :data-color="color"
             :style="[
-                `background-color: ${color}`
+                `background-color: ${getCorrectColor(color)}`
             ]"
-            @contextmenu="onColorRightClick($event, color)"
+            @contextmenu="onColorRightClick($event, getCorrectColor(color))"
             aria-haspopup="true"
-            @click="setCellColor(color)"
+            @click="setCellColor(getCorrectColor(color))"
         ></span>
         <input-icon
             v-if="colorHistory.length > 1"

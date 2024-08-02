@@ -129,7 +129,7 @@ export function useSettings() {
 
   function clearColorHistory() {
     colorHistory.value = []
-    colorHistory.value.push(cellColor.value)
+    colorHistory.value.push(getCorrectColor(cellColor.value))
     updateSelectedSchemeName()
   }
 
@@ -213,7 +213,7 @@ export function useSettings() {
       cellWidth: cellWidth.value,
       schemeWidth: schemeWidth.value,
       schemeHeight: schemeHeight.value,
-      cellColor: cellColor.value,
+      cellColor: getCorrectColor(cellColor.value),
       colorHistory: colorHistory.value,
     }
 
@@ -229,7 +229,7 @@ export function useSettings() {
     cellFill.value = schemeData.value.cellFill
     strokeColor.value = schemeData.value.strokeColor
     cellWidth.value = schemeData.value.cellWidth
-    cellColor.value = schemeData.value.cellColor
+    cellColor.value = getCorrectColor(schemeData.value.cellColor)
     colorHistory.value = schemeData.value.colorHistory
     scheme.value = new Map(schemeData.value.scheme)
 
@@ -245,7 +245,7 @@ export function useSettings() {
       cellWidth: cellWidth.value,
       schemeWidth: schemeWidth.value,
       schemeHeight: schemeHeight.value,
-      cellColor: cellColor.value,
+      cellColor: getCorrectColor(cellColor.value),
       colorHistory: [...colorHistory.value],
     }, schemeName)
   }
@@ -259,7 +259,7 @@ export function useSettings() {
     cellFill.value = params.cellFill
     strokeColor.value = params.strokeColor
     cellWidth.value = params.cellWidth
-    cellColor.value = params.cellColor
+    cellColor.value = getCorrectColor(params.cellColor)
     colorHistory.value = params.colorHistory
     scheme.value = new Map(params.scheme)
 
