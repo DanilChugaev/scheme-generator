@@ -130,11 +130,11 @@ export function useSettings() {
   function clearColorHistory() {
     colorHistory.value = []
     colorHistory.value.push(cellColor.value)
-    clearSelectedSchemeName()
+    updateSelectedSchemeName()
   }
 
-  function clearSelectedSchemeName() {
-    selectedScheme.value = ''
+  function updateSelectedSchemeName(name?: string) {
+    selectedScheme.value = name || ''
   }
 
   async function paintCell(id: string) {
@@ -148,7 +148,7 @@ export function useSettings() {
 
     cell.fill = cell.fill === newColor ? cellFill.value : newColor
     cell.isFilled = true
-    clearSelectedSchemeName()
+    updateSelectedSchemeName()
   }
 
   function exportImage(schemeName) {
@@ -168,7 +168,7 @@ export function useSettings() {
     schemeHeight.value = INITIAL_SCHEME_HEIGHT
     cellFill.value = INITIAL_CELL_FILL
     strokeColor.value = INITIAL_STROKE_COLOR
-    clearSelectedSchemeName()
+    updateSelectedSchemeName()
 
     updateScheme()
   }
@@ -216,6 +216,8 @@ export function useSettings() {
       cellColor: cellColor.value,
       colorHistory: colorHistory.value,
     }
+
+    updateSelectedSchemeName(name)
   }
 
   async function restoreSchemeFromFavoriteStorage(name: string) {
@@ -299,7 +301,7 @@ export function useSettings() {
     setColorAsBackground,
     shareScheme,
     parseScheme,
-    clearSelectedSchemeName,
+    updateSelectedSchemeName,
     setCellColor,
     getCorrectColor,
 

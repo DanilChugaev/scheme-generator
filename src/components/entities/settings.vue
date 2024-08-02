@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
-import { useDateFormat, useNow } from '@vueuse/core'
+import { computed, onMounted, ref, watch } from 'vue'
+import { useDateFormat, useNow, useMagicKeys } from '@vueuse/core'
 
 import Checkbox from 'primevue/checkbox'
 import ToggleSwitch from 'primevue/toggleswitch'
@@ -40,12 +40,20 @@ const {
   setColorAsBackground,
   shareScheme,
   parseScheme,
-  clearSelectedSchemeName,
+  updateSelectedSchemeName,
   updateScheme,
   setCellColor,
   getCorrectColor,
 } = useSettings()
 const { successNotify, warnNotify } = useNotifications()
+
+const { current } = useMagicKeys({
+  passive: false,
+  onEventFired(e) {
+    if ((e.ctrlKey || e.metaKey) && e.key === 's' && e.type === 'keydown')
+      e.preventDefault()
+  },
+})
 
 const menu = ref(null)
 const selectedColor = ref('')
@@ -136,8 +144,8 @@ function handlerAfterAcceptSaveSchemeToFavorite(message?: string) {
   successNotify(message || 'Схема добавлена в избранное', `Имя схемы: ${schemeName.value}`)
 
   isVisibleModalForSaveToFavorite.value = false
+  updateSelectedSchemeName(schemeName.value)
   schemeName.value = ''
-  clearSelectedSchemeName()
 }
 
 async function share() {
@@ -179,6 +187,35 @@ function toggleTheme(event) {
   toggleDarkMode(event)
   updateScheme()
 }
+
+function openModalForEnterName(isVisible) {
+  isVisible.value = true
+
+  if (selectedScheme.value) {
+    schemeName.value = selectedScheme.value
+  }
+}
+
+function openExportModal() {
+  openModalForEnterName(isVisibleModalForExport)
+}
+
+function openSaveToFavoriteModal() {
+  openModalForEnterName(isVisibleModalForSaveToFavorite)
+}
+
+function openShareModal() {
+  openModalForEnterName(isVisibleModalForShare)
+}
+
+
+watch(current, combination => {
+  if (combination.size < 2) return
+
+  if ((combination.has('control') || combination.has('meta')) && combination.has('s')) {
+    openSaveToFavoriteModal()
+  }
+})
 
 onMounted(() => {
   colorHistory.value = colorHistory.value.map(color => getCorrectColor(color))
@@ -293,19 +330,19 @@ onMounted(() => {
     <prime-button
         raised
         label="Скачать картинкой"
-        @click="isVisibleModalForExport = true"
+        @click="openExportModal"
     />
 
     <prime-button
         label="Сохранить в избранное"
         severity="secondary"
-        @click="isVisibleModalForSaveToFavorite = true"
+        @click="openSaveToFavoriteModal"
     />
 
     <prime-button
         label="Поделиться схемой"
         severity="secondary"
-        @click="isVisibleModalForShare = true"
+        @click="openShareModal"
     />
 
     <file-upload ref="fileupload" mode="basic" @select="parse" accept="application/json" chooseLabel="Загрузить схему"/>
