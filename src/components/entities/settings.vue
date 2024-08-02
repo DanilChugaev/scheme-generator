@@ -50,7 +50,7 @@ const { successNotify, warnNotify } = useNotifications()
 const { current } = useMagicKeys({
   passive: false,
   onEventFired(e) {
-    if ((e.ctrlKey || e.metaKey) && e.key === 's' && e.type === 'keydown')
+    if ((e.ctrlKey || e.metaKey) && (e.key === 's' || e.key === 'ы') && e.type === 'keydown')
       e.preventDefault()
   },
 })
