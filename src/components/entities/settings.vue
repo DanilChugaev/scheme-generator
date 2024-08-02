@@ -212,7 +212,7 @@ function openShareModal() {
 watch(current, combination => {
   if (combination.size < 2) return
 
-  if ((combination.has('control') || combination.has('meta')) && combination.has('s')) {
+  if ((combination.has('control') || combination.has('meta')) && (combination.has('s') || combination.has('ы'))) {
     openSaveToFavoriteModal()
   }
 })
