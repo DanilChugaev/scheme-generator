@@ -42,6 +42,7 @@ const {
   clearScheme,
   exportImage,
   setColorAsBackground,
+  setColorAsStroke,
   shareScheme,
   parseScheme,
   updateSelectedSchemeName,
@@ -70,9 +71,15 @@ const fileupload = ref()
 
 const filteredContextMenuItems = computed(() => [
   {
-    label: 'Использовать как фон',
+    label: 'Использовать как цвет фона',
     icon: 'pi pi-circle-fill',
     command: () => setColorAsBackground(selectedColor.value),
+    isVisible: true,
+  },
+  {
+    label: 'Использовать как цвет границ',
+    icon: 'pi pi-circle',
+    command: () => setColorAsStroke(selectedColor.value),
     isVisible: true,
   },
   {

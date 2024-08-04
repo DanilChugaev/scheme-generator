@@ -200,6 +200,12 @@ export function useSettings() {
     updateScheme()
   }
 
+  function setColorAsStroke(color: string) {
+    strokeColor.value = getCorrectColor(color)
+
+    updateScheme()
+  }
+
   function saveSchemeToFavoriteStorage(name: string) {
     const schemeData = useStorage<ISavedParams>(name, {})
 
@@ -361,6 +367,7 @@ export function useSettings() {
     removeColorFromHistory,
     clearScheme,
     setColorAsBackground,
+    setColorAsStroke,
     shareScheme,
     parseScheme,
     updateSelectedSchemeName,
