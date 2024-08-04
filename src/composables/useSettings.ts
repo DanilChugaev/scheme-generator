@@ -49,29 +49,54 @@ export function useSettings() {
 
   function updateScheme() {
     const result = new Map()
+    // с обеих сторон схемы добавляем доп пространство для цифр
+    const sizeY = schemeHeight.value + 2
+    const sizeX = schemeHeight.value + 2
 
-    for (let h = 0; h <= schemeHeight.value; h++) {
+    for (let h = 0; h < sizeY; h++) {
       const resultOffset = h % 2 === 0 ? cellOffset.value : 0
 
-      for (let w = 0; w <= schemeWidth.value; w++) {
+      for (let w = 0; w < sizeX; w++) {
         const id = `h_${h}-w_${w}`
+        const isEdgeX = w === 0 || w === sizeX - 1
+        const isEdgeY = h === 0 || h === sizeY - 1
 
-        if (w === 0 || h === 0) {
+        if (isEdgeX || isEdgeY) {
           if (scheme.value.get(id)) {
+            let textOffset = 0
+
+            if (w === sizeX - 1 || h === sizeY - 1) {
+              textOffset = cellOffset.value
+            }
+
             result.set(id, {
               ...scheme.value.get(id),
-              x: cellWidth.value * w,
-              y: h + cellHeight.value * h + 5,
+              x: cellWidth.value * w + textOffset,
+              y: h + cellHeight.value * h + 7,
               width: cellWidth.value,
               fill: textColor.value,
             })
           } else {
+            let text = 0
+
+            if (isEdgeX) {
+              text = h
+            } else if (isEdgeY) {
+              text = w
+            }
+
+            if (w === 0 && h === sizeY - 1) {
+              text = 0
+            } else if (w === sizeX - 1 && h === sizeY - 1) {
+              text = 0
+            }
+
             result.set(id, {
               type: 'text',
               id,
               x: cellWidth.value * w,
               y: h + cellHeight.value * h + 5,
-              text: w + h,
+              text,
               fontSize: WORKSPACE_FONT_SIZE,
               fontFamily: WORKSPACE_FONT_FAMILY,
               fill: textColor.value,
