@@ -299,6 +299,10 @@ export function useSettings() {
     comments.value.clear()
   }
 
+  function removeComment(id) {
+    comments.value.delete(id)
+  }
+
   return {
     scheme,
     comments,
@@ -330,6 +334,7 @@ export function useSettings() {
     addComment,
     saveCommentPosition,
     clearComments,
+    removeComment,
 
     updateScheme,
   }

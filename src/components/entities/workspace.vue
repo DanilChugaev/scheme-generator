@@ -25,6 +25,7 @@ const {
   paintCell,
   addComment,
   saveCommentPosition,
+  removeComment,
 } = useSettings()
 
 const configKonva = reactive({
@@ -32,17 +33,26 @@ const configKonva = reactive({
   height,
 })
 const group = ref(null)
+const workspaceMenu = ref(null)
+const labelMenu = ref(null)
 const isCacheEnabled = ref(true)
-const workspaceMenu = ref(true)
 const isVisibleModalForAddComment = ref(false)
+const isVisibleLabelContextMenu = ref(false)
 const commentText = ref('')
 const commentPositionX = ref(0)
 const commentPositionY = ref(0)
+const selectedCommentId = ref('')
 
 const contextMenuItems = computed(() => [
   {
     label: 'Добавить комментарий',
     command: () => isVisibleModalForAddComment.value = true,
+  },
+])
+const contextMenuLabelItems = computed(() => [
+  {
+    label: 'Удалить комментарий',
+    command: () => removeComment(selectedCommentId.value),
   },
 ])
 
@@ -99,11 +109,29 @@ function addNewComment() {
   commentPositionY.value = 0
 }
 
-async function viewWorkspaceContextMenu(event) {
-  commentPositionX.value = event.target.attrs.x + cellWidth.value / 2
-  commentPositionY.value = event.target.attrs.y + INITIAL_CELL_WIDTH / 2
+function viewWorkspaceContextMenu(event) {
+  event.evt.preventDefault()
+
+  if (isVisibleLabelContextMenu.value) return
+
+  // данная проверка позволяет избежать проблем, когда внутри группы есть пустые области,
+  // которые как будто к области не относятся и пытаемся там установить комментарий
+  if (event.target.attrs.x >= 0 && event.target.attrs.y >= 0) {
+    // если нажали внутри области группы
+    commentPositionX.value = event.target.attrs.x + cellWidth.value / 2
+    commentPositionY.value = event.target.attrs.y + INITIAL_CELL_WIDTH / 2
+  } else {
+    // если нажали вне области группы
+    commentPositionX.value = event.evt.x - groupConfig.value.x
+    commentPositionY.value = event.evt.y - groupConfig.value.y
+  }
 
   workspaceMenu.value?.show(event.evt)
+}
+
+function viewLabelContextMenu(event, id) {
+  selectedCommentId.value = id
+  labelMenu.value?.show(event.evt)
 }
 
 async function paint(event, id: string) {
@@ -168,6 +196,8 @@ onMounted(() => {
           >
             <v-label
               :config="comment.label"
+              aria-haspopup="true"
+              @contextmenu="viewLabelContextMenu($event, comment.id)"
               @dragstart="onDragLabelStart"
               @dragend="onDragLabelEnd($event, comment.id)"
             >
@@ -182,6 +212,13 @@ onMounted(() => {
     <context-menu
         ref="workspaceMenu"
         :model="contextMenuItems"
+    />
+
+    <context-menu
+        ref="labelMenu"
+        :model="contextMenuLabelItems"
+        @before-show="isVisibleLabelContextMenu = true"
+        @before-hide="isVisibleLabelContextMenu = false"
     />
   </div>
 </template>
