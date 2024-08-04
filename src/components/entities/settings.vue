@@ -238,7 +238,7 @@ watch(current, combination => {
 })
 
 onMounted(() => {
-  colorHistory.value = colorHistory.value.map(color => getCorrectColor(color))
+  colorHistory.value = [...new Set(colorHistory.value.map(color => getCorrectColor(color)))]
   updateScheme()
 })
 </script>

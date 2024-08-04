@@ -193,7 +193,7 @@ export function useSettings() {
       schemeWidth: schemeWidth.value,
       schemeHeight: schemeHeight.value,
       cellColor: getCorrectColor(cellColor.value),
-      colorHistory: colorHistory.value,
+      colorHistory: [...new Set(colorHistory.value)],
       isVisibleComments: isVisibleComments.value,
       comments: [...comments.value],
     }
@@ -211,9 +211,9 @@ export function useSettings() {
     strokeColor.value = schemeData.value.strokeColor
     cellWidth.value = schemeData.value.cellWidth
     cellColor.value = getCorrectColor(schemeData.value.cellColor)
-    colorHistory.value = schemeData.value.colorHistory
+    colorHistory.value = [...new Set(schemeData.value.colorHistory)] as string[]
     scheme.value = new Map(schemeData.value.scheme)
-    isVisibleComments.value = Boolean(schemeData.value.isVisibleComments)
+    isVisibleComments.value = schemeData.value.isVisibleComments ?? true
     comments.value = new Map(schemeData.value.comments || [])
 
     updateScheme()
@@ -229,7 +229,7 @@ export function useSettings() {
       schemeWidth: schemeWidth.value,
       schemeHeight: schemeHeight.value,
       cellColor: getCorrectColor(cellColor.value),
-      colorHistory: colorHistory.value,
+      colorHistory: [...new Set(colorHistory.value)],
       isVisibleComments: isVisibleComments.value,
       comments: [...comments.value],
     }, schemeName)
@@ -245,9 +245,9 @@ export function useSettings() {
     strokeColor.value = params.strokeColor
     cellWidth.value = params.cellWidth
     cellColor.value = getCorrectColor(params.cellColor)
-    colorHistory.value = params.colorHistory
+    colorHistory.value = [...new Set(params.colorHistory)]
     scheme.value = new Map(params.scheme)
-    isVisibleComments.value = Boolean(params.isVisibleComments)
+    isVisibleComments.value = params.isVisibleComments ?? true
     comments.value = new Map(params.comments || [])
 
     updateScheme()
