@@ -22,6 +22,7 @@ const {
   scheme,
   comments,
   cellWidth,
+  isVisibleComments,
   paintCell,
   addComment,
   saveCommentPosition,
@@ -190,20 +191,22 @@ onMounted(() => {
             />
           </template>
 
-          <template
-              v-for="comment of comments.values()"
-              :key="comment.id"
-          >
-            <v-label
-              :config="comment.label"
-              aria-haspopup="true"
-              @contextmenu="viewLabelContextMenu($event, comment.id)"
-              @dragstart="onDragLabelStart"
-              @dragend="onDragLabelEnd($event, comment.id)"
+          <template v-if="isVisibleComments">
+            <template
+                v-for="comment of comments.values()"
+                :key="comment.id"
             >
-              <v-tag :config="comment.tag" />
-              <v-text :config="comment.text" />
-            </v-label>
+              <v-label
+                  :config="comment.label"
+                  aria-haspopup="true"
+                  @contextmenu="viewLabelContextMenu($event, comment.id)"
+                  @dragstart="onDragLabelStart"
+                  @dragend="onDragLabelEnd($event, comment.id)"
+              >
+                <v-tag :config="comment.tag" />
+                <v-text :config="comment.text" />
+              </v-label>
+            </template>
           </template>
         </v-group>
       </v-layer>

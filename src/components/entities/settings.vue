@@ -34,6 +34,7 @@ const {
   toggleDarkMode,
   favorites,
   selectedScheme,
+  isVisibleComments,
   saveSchemeToFavoriteStorage,
   restoreSchemeFromFavoriteStorage,
   removeColorFromHistory,
@@ -282,6 +283,12 @@ onMounted(() => {
       <h3>Со смещением</h3>
 
       <checkbox v-model="hasCellOffset" :binary="true" @update:model-value="updateScheme" />
+    </div>
+
+    <div class="item">
+      <h3>Показать комментарии</h3>
+
+      <checkbox v-model="isVisibleComments" :binary="true" />
     </div>
 
     <div class="item">

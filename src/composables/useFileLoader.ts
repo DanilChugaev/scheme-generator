@@ -1,3 +1,5 @@
+import { ISavedParams } from '../types'
+
 export function useFileLoader() {
   function downloadJSON(obj, name) {
     const dataUri = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(obj))
@@ -18,7 +20,7 @@ export function useFileLoader() {
     document.body.removeChild(link)
   }
 
-  async function readFile(fileupload) {
+  async function readFile(fileupload): Promise<ISavedParams> {
     return new Promise((resolve, reject) => {
       const file = fileupload.files[0]
       const reader = new FileReader()

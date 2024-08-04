@@ -161,6 +161,7 @@ export function useSettings() {
     cellFill.value = INITIAL_CELL_FILL
     strokeColor.value = INITIAL_STROKE_COLOR
     updateSelectedSchemeName()
+    clearComments()
 
     updateScheme()
   }
@@ -192,6 +193,8 @@ export function useSettings() {
       schemeHeight: schemeHeight.value,
       cellColor: getCorrectColor(cellColor.value),
       colorHistory: colorHistory.value,
+      isVisibleComments: isVisibleComments.value,
+      comments: [...comments.value],
     }
 
     updateSelectedSchemeName(name)
@@ -209,11 +212,13 @@ export function useSettings() {
     cellColor.value = getCorrectColor(schemeData.value.cellColor)
     colorHistory.value = schemeData.value.colorHistory
     scheme.value = new Map(schemeData.value.scheme)
+    isVisibleComments.value = Boolean(schemeData.value.isVisibleComments)
+    comments.value = new Map(schemeData.value.comments || [])
 
     updateScheme()
   }
 
-  function shareScheme(schemeName) {
+  function shareScheme(schemeName: string) {
     downloadJSON({
       scheme: [...scheme.value],
       hasCellOffset: hasCellOffset.value,
@@ -223,7 +228,9 @@ export function useSettings() {
       schemeWidth: schemeWidth.value,
       schemeHeight: schemeHeight.value,
       cellColor: getCorrectColor(cellColor.value),
-      colorHistory: [...colorHistory.value],
+      colorHistory: colorHistory.value,
+      isVisibleComments: isVisibleComments.value,
+      comments: [...comments.value],
     }, schemeName)
   }
 
@@ -239,6 +246,8 @@ export function useSettings() {
     cellColor.value = getCorrectColor(params.cellColor)
     colorHistory.value = params.colorHistory
     scheme.value = new Map(params.scheme)
+    isVisibleComments.value = Boolean(params.isVisibleComments)
+    comments.value = new Map(params.comments || [])
 
     updateScheme()
   }
