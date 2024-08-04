@@ -144,7 +144,8 @@ export function useSettings() {
     const newColor = getCorrectColor(cellColor.value)
 
     cell.fill = cell.fill === newColor ? cellFill.value : newColor
-    cell.isFilled = true
+    cell.isFilled = cell.fill !== INITIAL_CELL_FILL
+
     updateSelectedSchemeName()
   }
 
