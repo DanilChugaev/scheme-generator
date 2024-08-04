@@ -15,10 +15,14 @@ import FileUpload from 'primevue/fileupload'
 import { useConfirm } from 'primevue/useconfirm'
 import { useSettings } from '../../composables/useSettings'
 import { useNotifications } from '../../composables/useNotifications'
-import EnterSchemeName from '../modals/enter-scheme-name.vue'
+import EnterNameModal from '../modals/enter-name.vue'
+import { useWorkspace } from '../../composables/useWorkspace'
 
 const confirm = useConfirm()
 
+const {
+  clearWorkspacePosition,
+} = useWorkspace()
 const {
   isDark,
   hasCellOffset,
@@ -35,7 +39,6 @@ const {
   removeColorFromHistory,
   clearColorHistory,
   clearScheme,
-  clearSchemePosition,
   exportImage,
   setColorAsBackground,
   shareScheme,
@@ -44,6 +47,7 @@ const {
   updateScheme,
   setCellColor,
   getCorrectColor,
+  clearComments,
 } = useSettings()
 const { successNotify, warnNotify } = useNotifications()
 
@@ -92,6 +96,19 @@ function checkClearScheme(event) {
     rejectLabel: 'Нет',
     acceptLabel: 'Да',
     accept: () => clearScheme(),
+  })
+}
+
+function checkClearComments(event) {
+  confirm.require({
+    target: event.currentTarget,
+    message: 'Вы точно хотите удалить все комментарии?',
+    icon: 'pi pi-info-circle',
+    rejectClass: 'p-button-secondary p-button-outlined p-button-sm',
+    acceptClass: 'p-button-danger p-button-sm',
+    rejectLabel: 'Нет',
+    acceptLabel: 'Да',
+    accept: () => clearComments(),
   })
 }
 
@@ -224,17 +241,17 @@ onMounted(() => {
 </script>
 
 <template>
-  <enter-scheme-name
+  <enter-name-modal
     v-model="schemeName"
     v-model:is-visible="isVisibleModalForSaveToFavorite"
     @save="saveSchemeToFavorite"
   />
-  <enter-scheme-name
+  <enter-name-modal
     v-model="schemeName"
     v-model:is-visible="isVisibleModalForShare"
     @save="share"
   />
-  <enter-scheme-name
+  <enter-name-modal
     v-model="schemeName"
     v-model:is-visible="isVisibleModalForExport"
     @save="exportImageToComputer"
@@ -351,7 +368,12 @@ onMounted(() => {
       <prime-button
           severity="secondary"
           label="Сбросить местоположение"
-          @click="clearSchemePosition"
+          @click="clearWorkspacePosition"
+      />
+      <prime-button
+          severity="secondary"
+          label="Удалить комментарии"
+          @click="checkClearComments"
       />
       <prime-button
           severity="danger" outlined

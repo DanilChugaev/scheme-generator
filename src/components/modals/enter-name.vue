@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ref } from 'vue'
 import PrimeDialog from 'primevue/dialog'
 import PrimeButton from 'primevue/button'
 import InputText from 'primevue/inputtext'
@@ -10,7 +11,7 @@ const isVisible = defineModel('isVisible', {
 const model = defineModel()
 
 defineProps({
-  name: {
+  title: {
     type: String,
     default: 'Введите имя схемы',
   },
@@ -24,14 +25,24 @@ defineProps({
   },
 })
 
-defineEmits(['save'])
+const emit = defineEmits(['save'])
+
+const isValid = ref(true)
+
+function validateBeforeSave(event) {
+  if (!model.value) {
+    isValid.value = false
+  } else {
+    emit('save', event)
+  }
+}
 </script>
 
 <template>
   <prime-dialog
       v-model:visible="isVisible"
       modal
-      :header="name"
+      :header="title"
       :style="{ width: '25rem' }"
   >
     <input-text
@@ -39,6 +50,8 @@ defineEmits(['save'])
         class="w-full"
         autocomplete="off"
         autofocus
+        :invalid="!isValid"
+        @update:model-value="isValid = true"
         @keydown.enter="$emit('save', $event)"
     />
 
@@ -52,7 +65,7 @@ defineEmits(['save'])
       <prime-button
           type="button"
           :label="saveLabel"
-          @click="$emit('save', $event)"
+          @click="validateBeforeSave($event)"
       />
     </div>
   </prime-dialog>

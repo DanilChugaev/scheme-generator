@@ -1,9 +1,17 @@
 import { ref } from 'vue'
+import { INITIAL_GROUP_POSITION, INITIAL_STAGE_SCALE } from '../constants'
+import { useStorage } from '@vueuse/core'
 
 const stage = ref(null)
 
 export function useWorkspace() {
   const scaleBy = 1.2
+
+  const groupConfig = useStorage('group-config', {
+    x: INITIAL_GROUP_POSITION,
+    y: INITIAL_GROUP_POSITION,
+    draggable: true,
+  })
 
   function scaling(event) {
     // TODO: добавить здесь кэширование
@@ -41,11 +49,36 @@ export function useWorkspace() {
     stage.value.container().style.cursor = 'move'
   }
 
+  function saveWorkspacePosition({ x, y }) {
+    if (groupConfig.value.draggable) {
+      groupConfig.value.x = x
+      groupConfig.value.y = y
+    }
+  }
+
+  function clearWorkspacePosition() {
+    const position = INITIAL_GROUP_POSITION
+
+    stage.value.scale({
+      x: INITIAL_STAGE_SCALE,
+      y: INITIAL_STAGE_SCALE,
+    })
+    stage.value.position({
+      x: position,
+      y: position,
+    })
+    groupConfig.value.x = position
+    groupConfig.value.y = position
+  }
+
   return {
     stage,
+    groupConfig,
     scaling,
     setCursorPointer,
     setCursorDefault,
     setCursorMove,
+    saveWorkspacePosition,
+    clearWorkspacePosition,
   }
 }

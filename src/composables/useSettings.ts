@@ -1,5 +1,5 @@
 import { computed, inject, watch, ref } from 'vue'
-import { useStorage, useDebounceFn } from '@vueuse/core'
+import { useStorage, useDebounceFn, useDateFormat, useNow } from '@vueuse/core'
 import { useWorkspace } from './useWorkspace'
 import {
   INITIAL_CELL_FILL,
@@ -9,11 +9,11 @@ import {
   TEXT_COLOR_FOR_DARK_THEME,
   TEXT_COLOR_FOR_LIGHT_THEME,
   INITIAL_CELL_WIDTH,
-  INITIAL_GROUP_POSITION,
-  INITIAL_STAGE_SCALE,
   STROKE_WIDTH,
   CORNER_RADIUS,
   INITIAL_CELL_COLOR,
+  WORKSPACE_FONT_SIZE,
+  WORKSPACE_FONT_FAMILY,
 } from '../constants'
 import { ISavedParams } from '../types'
 import { useFileLoader } from './useFileLoader'
@@ -23,11 +23,6 @@ export function useSettings() {
   const { stage } = useWorkspace()
   const { downloadJSON, downloadURI, readFile } = useFileLoader()
 
-  const groupConfig = useStorage('group-config', {
-    x: INITIAL_GROUP_POSITION,
-    y: INITIAL_GROUP_POSITION,
-    draggable: true,
-  })
   const hasCellOffset = useStorage('has-cell-offset', false)
   const schemeWidth = useStorage('scheme-width', INITIAL_SCHEME_WIDTH)
   const schemeHeight = useStorage('scheme-height', INITIAL_SCHEME_HEIGHT)
@@ -38,6 +33,8 @@ export function useSettings() {
   const cellFill = useStorage('cell-fill', INITIAL_CELL_FILL)
   const strokeColor = useStorage('stroke-color', INITIAL_STROKE_COLOR)
   const favorites = useStorage<string[]>('favorites', [])
+  const comments = useStorage('comments', new Map())
+  const isVisibleComments = useStorage('is-visible-comments', true)
 
   const isDark = ref(toggleDarkMode())
   const cellHeight = ref(INITIAL_CELL_WIDTH)
@@ -75,8 +72,8 @@ export function useSettings() {
               x: cellWidth.value * w,
               y: h + cellHeight.value * h + 5,
               text: w + h,
-              fontSize: 16,
-              fontFamily: 'sans-serif',
+              fontSize: WORKSPACE_FONT_SIZE,
+              fontFamily: WORKSPACE_FONT_FAMILY,
               fill: textColor.value,
               width: cellWidth.value,
               padding: 10,
@@ -157,11 +154,6 @@ export function useSettings() {
     downloadURI(dataURL, `${schemeName}.png`)
   }
 
-  function saveSchemePosition({ x, y }) {
-    groupConfig.value.x = x
-    groupConfig.value.y = y
-  }
-
   function clearScheme() {
     scheme.value.clear()
     schemeWidth.value = INITIAL_SCHEME_WIDTH
@@ -171,21 +163,6 @@ export function useSettings() {
     updateSelectedSchemeName()
 
     updateScheme()
-  }
-
-  function clearSchemePosition() {
-    const position = INITIAL_GROUP_POSITION
-
-    stage.value.scale({
-      x: INITIAL_STAGE_SCALE,
-      y: INITIAL_STAGE_SCALE,
-    })
-    stage.value.position({
-      x: position,
-      y: position,
-    })
-    groupConfig.value.x = position
-    groupConfig.value.y = position
   }
 
   function setColorAsBackground(color: string) {
@@ -275,11 +252,58 @@ export function useSettings() {
     cellColor.value = getCorrectColor(color)
   }
 
+  function addComment(comment, x, y) {
+    const id = useDateFormat(useNow(), 'YYYY-MM-DD HH:mm:ss')
+
+    comments.value.set(id.value, {
+      id: id.value,
+      label: {
+        x,
+        y,
+        opacity: 0.75,
+        draggable: true,
+      },
+      tag: {
+        fill: 'black',
+        pointerDirection: 'down',
+        pointerWidth: 10,
+        pointerHeight: 10,
+        lineJoin: 'round',
+        shadowColor: 'black',
+        shadowBlur: 10,
+        shadowOffset: {
+          x: 10,
+          y: 10,
+        },
+        shadowOpacity: 0.5,
+        cornerRadius: cornerRadius.value,
+      },
+      text: {
+        text: comment,
+        fontSize: WORKSPACE_FONT_SIZE,
+        fontFamily: WORKSPACE_FONT_FAMILY,
+        padding: 5,
+        fill: 'white',
+      },
+    })
+  }
+
+  function saveCommentPosition({ id, x, y }) {
+    const comment = comments.value.get(id)
+
+    comment.label.x = x
+    comment.label.y = y
+  }
+
+  function clearComments() {
+    comments.value.clear()
+  }
+
   return {
     scheme,
+    comments,
     isDark,
     hasCellOffset,
-    groupConfig,
     schemeWidth,
     schemeHeight,
     cellWidth,
@@ -289,21 +313,23 @@ export function useSettings() {
     toggleDarkMode,
     favorites,
     selectedScheme,
+    isVisibleComments,
     saveSchemeToFavoriteStorage,
     restoreSchemeFromFavoriteStorage,
     paintCell,
     clearColorHistory,
     exportImage,
     removeColorFromHistory,
-    saveSchemePosition,
     clearScheme,
-    clearSchemePosition,
     setColorAsBackground,
     shareScheme,
     parseScheme,
     updateSelectedSchemeName,
     setCellColor,
     getCorrectColor,
+    addComment,
+    saveCommentPosition,
+    clearComments,
 
     updateScheme,
   }
