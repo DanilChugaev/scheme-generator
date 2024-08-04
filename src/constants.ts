@@ -1,3 +1,4 @@
+export const INITIAL_HAS_CELL_OFFSET = false
 export const INITIAL_CELL_FILL = '#add8e6'
 export const INITIAL_CELL_COLOR = '#6466f1'
 export const INITIAL_STROKE_COLOR = 'black'

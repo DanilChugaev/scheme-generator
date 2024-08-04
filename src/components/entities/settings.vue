@@ -50,6 +50,7 @@ const {
   setCellColor,
   getCorrectColor,
   clearComments,
+  updateColorHistory,
 } = useSettings()
 const { successNotify, warnNotify } = useNotifications()
 
@@ -326,6 +327,7 @@ onMounted(() => {
           format="hex"
           shape="circle"
           disable-history
+          @update:pure-color="updateColorHistory($event)"
       />
     </div>
 

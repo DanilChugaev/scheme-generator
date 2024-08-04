@@ -1,7 +1,8 @@
-import { computed, inject, watch, ref } from 'vue'
-import { useStorage, useDebounceFn, useDateFormat, useNow } from '@vueuse/core'
+import { computed, inject, ref } from 'vue'
+import { useStorage, useDateFormat, useNow } from '@vueuse/core'
 import { useWorkspace } from './useWorkspace'
 import {
+  INITIAL_HAS_CELL_OFFSET,
   INITIAL_CELL_FILL,
   INITIAL_STROKE_COLOR,
   INITIAL_SCHEME_WIDTH,
@@ -23,7 +24,7 @@ export function useSettings() {
   const { stage } = useWorkspace()
   const { downloadJSON, downloadURI, readFile } = useFileLoader()
 
-  const hasCellOffset = useStorage('has-cell-offset', false)
+  const hasCellOffset = useStorage('has-cell-offset', INITIAL_HAS_CELL_OFFSET)
   const schemeWidth = useStorage('scheme-width', INITIAL_SCHEME_WIDTH)
   const schemeHeight = useStorage('scheme-height', INITIAL_SCHEME_HEIGHT)
   const cellColor = useStorage('cell-color', INITIAL_CELL_COLOR)
@@ -44,8 +45,6 @@ export function useSettings() {
 
   const cellOffset = computed(() => hasCellOffset.value ? cellWidth.value / 2 : 0)
   const textColor = computed(() => isDark.value ? TEXT_COLOR_FOR_DARK_THEME : TEXT_COLOR_FOR_LIGHT_THEME)
-
-  watch(cellColor, useDebounceFn(_updateColorHistory, 300))
 
   function updateScheme() {
     const result = new Map()
@@ -137,7 +136,7 @@ export function useSettings() {
     scheme.value = result
   }
 
-  function _updateColorHistory(color: string) {
+  function updateColorHistory(color: string) {
     colorHistory.value = [...new Set([...colorHistory.value, getCorrectColor(color)])]
   }
 
@@ -186,6 +185,7 @@ export function useSettings() {
     schemeHeight.value = INITIAL_SCHEME_HEIGHT
     cellFill.value = INITIAL_CELL_FILL
     strokeColor.value = INITIAL_STROKE_COLOR
+    hasCellOffset.value = INITIAL_HAS_CELL_OFFSET
     updateSelectedSchemeName()
     clearComments()
 
@@ -377,6 +377,7 @@ export function useSettings() {
     saveCommentPosition,
     clearComments,
     removeComment,
+    updateColorHistory,
 
     updateScheme,
   }
