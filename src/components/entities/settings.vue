@@ -70,14 +70,16 @@ const fileupload = ref()
 
 const filteredContextMenuItems = computed(() => [
   {
-    label: 'Удалить этот цвет',
-    command: () => removeColorFromHistory(selectedColor.value),
-    isVisible: colorHistory.value.length > 1,
-  },
-  {
     label: 'Использовать как фон',
+    icon: 'pi pi-circle-fill',
     command: () => setColorAsBackground(selectedColor.value),
     isVisible: true,
+  },
+  {
+    label: 'Удалить этот цвет',
+    icon: 'pi pi-trash',
+    command: () => removeColorFromHistory(selectedColor.value),
+    isVisible: colorHistory.value.length > 1,
   },
 ].filter(item => item.isVisible))
 

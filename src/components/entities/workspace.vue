@@ -47,12 +47,15 @@ const selectedCommentId = ref('')
 const contextMenuItems = computed(() => [
   {
     label: 'Добавить комментарий',
+    icon: 'pi pi-plus',
     command: () => isVisibleModalForAddComment.value = true,
   },
 ])
+
 const contextMenuLabelItems = computed(() => [
   {
     label: 'Удалить комментарий',
+    icon: 'pi pi-trash',
     command: () => removeComment(selectedCommentId.value),
   },
 ])
