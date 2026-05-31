@@ -8,17 +8,12 @@ export function useNotifications() {
   const toast = useToast()
 
   const notify = (type: NotifyType, message: NotifyMessage, detail?: NotifyMessage) => {
-    const params = {
+    toast.add({
       severity: type,
       summary: message,
+      detail: detail || undefined,
       life: NOTIFICATION_LIFETIME,
-    }
-
-    if (detail) {
-      params.detail = detail
-    }
-
-    toast.add(params)
+    })
   }
 
   const successNotify = (message: NotifyMessage, detail?: NotifyMessage) => notify('success', message, detail)

@@ -20,7 +20,7 @@ import { ISavedParams } from '../types'
 import { useFileLoader } from './useFileLoader'
 
 export function useSettings() {
-  const toggleDarkMode = inject('toggleDarkMode')
+  const toggleDarkMode: (() => boolean) | undefined = inject('toggleDarkMode')
   const { stage } = useWorkspace()
   const { downloadJSON, downloadURI, readFile } = useFileLoader()
 
@@ -37,7 +37,7 @@ export function useSettings() {
   const comments = useStorage('comments', new Map())
   const isVisibleComments = useStorage('is-visible-comments', true)
 
-  const isDark = ref(toggleDarkMode())
+  const isDark = ref(toggleDarkMode?.() ?? false)
   const cellHeight = ref(INITIAL_CELL_WIDTH)
   const strokeWidth = ref(STROKE_WIDTH)
   const cornerRadius = ref(CORNER_RADIUS)
@@ -148,8 +148,8 @@ export function useSettings() {
     updateSelectedSchemeName()
   }
 
-  function exportImage(schemeName) {
-    const dataURL = stage.value.toDataURL({ pixelRatio: 3 })
+  function exportImage(schemeName: string) {
+    const dataURL = stage.value?.toDataURL({ pixelRatio: 3 })
 
     downloadURI(dataURL, `${schemeName}.png`)
   }
@@ -182,12 +182,12 @@ export function useSettings() {
   }
 
   function saveSchemeToFavoriteStorage(name: string) {
-    const schemeData = useStorage<ISavedParams>(name, {})
+    const schemeData = useStorage<ISavedParams>(name, {} as ISavedParams)
 
     favorites.value = [...new Set([...favorites.value, name])]
 
     if (schemeData.value) {
-      schemeData.value = {}
+      schemeData.value = {} as ISavedParams
     }
 
     schemeData.value = {
@@ -208,7 +208,7 @@ export function useSettings() {
   }
 
   async function restoreSchemeFromFavoriteStorage(name: string) {
-    const schemeData = useStorage<ISavedParams>(name, {})
+    const schemeData = useStorage<ISavedParams>(name, {} as ISavedParams)
 
     schemeHeight.value = schemeData.value.schemeHeight
     schemeWidth.value = schemeData.value.schemeWidth
@@ -227,7 +227,7 @@ export function useSettings() {
 
   function shareScheme(schemeName: string) {
     downloadJSON({
-      scheme: [...scheme.value],
+      scheme: Array.from(scheme.value.entries()) as any,
       hasCellOffset: hasCellOffset.value,
       cellFill: cellFill.value,
       strokeColor: strokeColor.value,
@@ -237,11 +237,11 @@ export function useSettings() {
       cellColor: getCorrectColor(cellColor.value),
       colorHistory: [...new Set(colorHistory.value)],
       isVisibleComments: isVisibleComments.value,
-      comments: [...comments.value],
+      comments: Array.from(comments.value.entries()) as any,
     }, schemeName)
   }
 
-  async function parseScheme(fileupload) {
+  async function parseScheme(fileupload: HTMLInputElement) {
     const params: ISavedParams = await readFile(fileupload)
 
     schemeHeight.value = params.schemeHeight
@@ -268,7 +268,7 @@ export function useSettings() {
     cellColor.value = getCorrectColor(color)
   }
 
-  function addComment(comment, x, y) {
+  function addComment(comment: string, x: number, y: number) {
     const id = useDateFormat(useNow(), 'YYYY-MM-DD HH:mm:ss')
 
     comments.value.set(id.value, {
@@ -304,7 +304,7 @@ export function useSettings() {
     })
   }
 
-  function saveCommentPosition({ id, x, y }) {
+  function saveCommentPosition({ id, x, y }: { id: string; x: number; y: number }) {
     const comment = comments.value.get(id)
 
     comment.label.x = x
@@ -315,7 +315,7 @@ export function useSettings() {
     comments.value.clear()
   }
 
-  function removeComment(id) {
+  function removeComment(id: string) {
     comments.value.delete(id)
   }
 

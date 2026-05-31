@@ -2,7 +2,7 @@ import { ref } from 'vue'
 import { INITIAL_GROUP_POSITION, INITIAL_STAGE_SCALE } from '../constants'
 import { useStorage } from '@vueuse/core'
 
-const stage = ref(null)
+const stage = ref<any>(null)
 
 export function useWorkspace() {
   const scaleBy = 1.2
@@ -13,7 +13,7 @@ export function useWorkspace() {
     draggable: true,
   })
 
-  function scaling(event) {
+  function scaling(event: any) {
     // TODO: добавить здесь кэширование
     // stop default scrolling
     event.evt.preventDefault()
@@ -49,7 +49,7 @@ export function useWorkspace() {
     stage.value.container().style.cursor = 'move'
   }
 
-  function saveWorkspacePosition({ x, y }) {
+  function saveWorkspacePosition({ x, y }: { x: number; y: number }) {
     if (groupConfig.value.draggable) {
       groupConfig.value.x = x
       groupConfig.value.y = y

@@ -1,7 +1,7 @@
 import { ISavedParams } from '../types'
 
 export function useFileLoader() {
-  function downloadJSON(obj, name) {
+  function downloadJSON(obj: ISavedParams, name: string) {
     const dataUri = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(obj))
     const anchorElement = document.createElement('a')
     anchorElement.href = dataUri
@@ -20,14 +20,23 @@ export function useFileLoader() {
     document.body.removeChild(link)
   }
 
-  async function readFile(fileupload): Promise<ISavedParams> {
+  async function readFile(fileupload: HTMLInputElement): Promise<ISavedParams> {
     return new Promise((resolve, reject) => {
-      const file = fileupload.files[0]
+      const files = fileupload.files || null
+      if (!files) {
+        reject(new Error('No files selected'))
+        return
+      }
+      const file = files[0]
+      if (!file) {
+        reject(new Error('No file selected'))
+        return
+      }
       const reader = new FileReader()
 
       reader.readAsText(file)
 
-      reader.onload = () => resolve(JSON.parse(reader.result))
+      reader.onload = () => resolve(JSON.parse(reader.result as string))
       reader.onerror = () => reject(reader.error)
     })
   }

@@ -1,5 +1,5 @@
 export interface ISavedParams {
-  scheme: Map<string, Object>
+  scheme: [string, any][]
   hasCellOffset: boolean
   cellFill: string
   strokeColor: string
@@ -9,5 +9,5 @@ export interface ISavedParams {
   cellColor: string
   colorHistory: string[]
   isVisibleComments: boolean
-  comments: Map<string, Object>
+  comments: [string, any][]
 }

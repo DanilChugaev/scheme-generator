@@ -8,7 +8,8 @@
     "preview": "vite preview",
     "lint": "eslint src/**/**.{ts,vue} --fix",
     "prepare": "husky install",
-    "sprite": "node src/tools/sprite-generator.cjs"
+    "sprite": "node src/tools/sprite-generator.cjs",
+    "ts:check": "vue-tsc --noEmit"
   },
   "dependencies": {
     "@primevue/themes": "^4.0.0",
@@ -32,9 +33,9 @@
     "postcss-custom-media": "^10.0.8",
     "postcss-nested": "^6.2.0",
     "tailwindcss": "^3.4.6",
-    "typescript": "^5.5.3",
+    "typescript": "^5.9.3",
     "vite": "^4.5.3",
     "vitest": "^0.34.6",
-    "vue-tsc": "^1.8.27"
+    "vue-tsc": "^3.1.5"
   }
 }
